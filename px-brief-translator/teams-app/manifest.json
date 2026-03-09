@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "{{MICROSOFT-APP-ID}}",
+  "developer": {
+    "name": "Bayer PX",
+    "websiteUrl": "https://{{YOUR-APP-NAME}}.azurestaticapps.net",
+    "privacyUrl": "https://{{YOUR-APP-NAME}}.azurestaticapps.net/privacy",
+    "termsOfUseUrl": "https://{{YOUR-APP-NAME}}.azurestaticapps.net/terms"
+  },
+  "name": {
+    "short": "Brief Translator",
+    "full": "PX Brief Translator — AI Agent Workflow"
+  },
+  "description": {
+    "short": "Translate project briefs into sub-home working briefs using AI.",
+    "full": "The PX Brief Translator takes a single project brief and generates six tailored working briefs for Product Research, Brand Design, Product Design, Packaging Innovation, Packaging Engineering, and Graphics Management. Powered by myGenAssist."
+  },
+  "icons": {
+    "color": "color-192x192.png",
+    "outline": "outline-32x32.png"
+  },
+  "accentColor": "#00bcff",
+  "staticTabs": [
+    {
+      "entityId": "brief-translator",
+      "name": "Brief Translator",
+      "contentUrl": "https://{{YOUR-APP-NAME}}.azurestaticapps.net",
+      "websiteUrl": "https://{{YOUR-APP-NAME}}.azurestaticapps.net",
+      "scopes": ["personal"]
+    }
+  ],
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://{{YOUR-APP-NAME}}.azurestaticapps.net",
+      "canUpdateConfiguration": false,
+      "scopes": ["team", "groupChat"]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": [
+    "{{YOUR-APP-NAME}}.azurestaticapps.net",
+    "chat.int.bayer.com"
+  ]
+}

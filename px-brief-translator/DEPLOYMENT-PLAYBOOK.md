@@ -241,6 +241,49 @@ Or just use the GitHub web UI: repo → Settings → Secrets → Actions.
 
 ---
 
+## Monorepo: Multiple Apps in One Repo
+
+If you have multiple apps (e.g. `px-brief-translator` + `px-persona-generator`) in the same repo:
+
+### Folder Structure
+```
+YourRepo/
+├── .github/
+│   └── workflows/
+│       ├── deploy-app-one.yml       ← one workflow per app
+│       └── deploy-app-two.yml
+├── px-brief-translator/
+│   ├── package.json
+│   ├── src/
+│   └── public/
+└── px-persona-generator/
+    ├── package.json
+    ├── src/
+    └── public/
+```
+
+### Key Rules
+1. **One Azure Static Web App resource per app** — create each separately in Azure Portal
+2. **One workflow file per app** — each points `app_location` to its subfolder
+3. **One deployment token per app** — each gets its own GitHub secret (e.g. `AZURE_STATIC_WEB_APPS_API_TOKEN_BRIEF` and `AZURE_STATIC_WEB_APPS_API_TOKEN_PERSONA`)
+4. **Use `paths` filters** — so each workflow only triggers when its own folder changes:
+   ```yaml
+   on:
+     push:
+       branches: [main]
+       paths:
+         - 'px-brief-translator/**'    # only trigger for this app's changes
+   ```
+
+### Setup Steps for Each New App
+1. Create the Azure Static Web App in Azure Portal (link to the same repo, set `app_location` to the subfolder)
+2. Azure may auto-generate a workflow — if so, just add the `paths` filter to it
+3. If Azure doesn't generate one, create a workflow file manually (see template below)
+4. Get the deployment token from Azure Portal → add as a GitHub secret
+5. Push and verify
+
+---
+
 ## Workflow File Template
 
 For a Vite + React app living in a subfolder:

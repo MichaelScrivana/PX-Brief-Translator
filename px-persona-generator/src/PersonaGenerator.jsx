@@ -391,6 +391,17 @@ Evaluate the following product concept/claim/message through this persona's eyes
   // ══════════════════════════════════════════════
   return (
     <div>
+      {/* ── Header (matches AI Hub) ── */}
+      <header className="pg-header">
+        <div className="pg-header-left">
+          <img src="/img/PX-logo-blk@3x.png" alt="PX" className="pg-header-logo" />
+          <span className="pg-header-title">AI Hub</span>
+        </div>
+        <div className="pg-header-right">
+          <span className="pg-header-badge">Persona Generator</span>
+        </div>
+      </header>
+
       {/* ── Loop Monitor (White) ── */}
       <div className="loop-monitor">
         <button
@@ -421,7 +432,7 @@ Evaluate the following product concept/claim/message through this persona's eyes
           )}
           {complete && !currentMsg?.text?.includes("panel ready") && (
             <span className="loop-status-line entering" data-type="complete">
-              8 synthetic personas generated — panel ready for review
+              9 synthetic personas generated — panel ready for review
             </span>
           )}
         </div>

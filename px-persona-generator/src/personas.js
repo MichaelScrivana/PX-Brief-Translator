@@ -346,6 +346,49 @@ export const PERSONAS = [
       packaging: "Dorm-proof: compact, doesn't look like 'medicine', ideally desk-display friendly. Consider single-serve daily packs to prevent overconsumption.",
       agentReadiness: "Agent data needs to support proxy purchasing: gift/send-to-another capabilities, age-appropriate dosing warnings, and overconsumption safeguards for gummy formats."
     }
+  },
+  {
+    id: "priya",
+    name: "Priya Sharma",
+    age: 38,
+    location: "Atlanta, GA",
+    segment: "Chronic Condition Navigator",
+    occupation: "Accountant",
+    gradient: ["#E17055", "#D63031"],
+    health: {
+      context: "Diagnosed with Hashimoto's thyroiditis three years ago. Managing with levothyroxine but exploring supplements to address lingering fatigue, brain fog, and hair thinning. Balances her endocrinologist's advice with Ayurvedic practices she grew up with — her mother in Delhi regularly sends her ashwagandha and turmeric.",
+      goals: ["Manage autoimmune symptoms alongside medication", "Bridge Western medicine with traditional Ayurvedic approach", "Reduce fatigue and brain fog without adding more prescriptions"],
+      decisionStyle: "Dual-framework evaluator. Cross-references her endocrinologist's guidance with Ayurvedic principles. Reads both PubMed and traditional medicine texts. Won't take anything that could interfere with her thyroid medication — checks drug interactions obsessively.",
+      purchaseTriggers: ["No thyroid medication interactions", "Backed by both clinical and traditional evidence", "Recommended in autoimmune-specific communities", "Transparent about absorption timing relative to medications"],
+      dealbreakers: ["Contains biotin (interferes with thyroid lab tests)", "No interaction data with levothyroxine", "Dismisses traditional medicine", "Contains soy or gluten (autoimmune triggers)"],
+      channels: ["Banyan Botanicals", "Thorne", "iHerb", "Indian grocery stores for traditional herbs", "Amazon with heavy review filtering"],
+      influences: ["Thyroid-specific Facebook groups", "Dr. Izabella Wentz (thyroid pharmacist)", "Her mother's Ayurvedic knowledge", "Her endocrinologist", "Autoimmune Protocol community"]
+    },
+    agentBehavior: {
+      delegationModel: "Safety-first delegation — would use an AI agent primarily as an interaction checker and timing optimizer. Needs the agent to understand both pharmaceutical interactions and traditional medicine contraindications. Trusts the agent for logistics but makes all final decisions with her doctor.",
+      trustLevel: "Medium for research, zero for final decisions. Would trust an AI agent to flag interactions and organize her supplement schedule around her levothyroxine timing, but every addition to her stack goes through her endocrinologist first.",
+      agentQuery: "I take levothyroxine 75mcg at 6 AM on an empty stomach. I want to add Vitamin D3, selenium, and ashwagandha to support my Hashimoto's. Build me a timing schedule that avoids any absorption interference with my thyroid medication. Flag any interactions. Only suggest brands that are gluten-free, soy-free, and third-party tested. Show me both the clinical evidence and any relevant Ayurvedic context for each supplement.",
+      evaluationCriteria: ["Medication interaction safety", "Absorption timing optimization", "Autoimmune-friendly (no common triggers)", "Dual evidence base (clinical + traditional)", "Allergen transparency"]
+    },
+    deepDive: {
+      quote: "My doctor treats my thyroid. My mother treats my spirit. I need supplements that respect both without making either one worse.",
+      dayInLife: "Priya's morning is a precisely timed pharmaceutical ritual. Levothyroxine at 6 AM with plain water — then she waits 60 minutes before anything else. At 7 AM, she makes chai (decaf now, caffeine interferes) and takes her Vitamin D and selenium. The ashwagandha her mother sent sits in a steel dabba on the counter — she mixes it into warm milk at 8 PM, the way her mother taught her. She keeps a spreadsheet of what she takes, when, and how she feels — not because she's a biohacker, but because her autoimmune condition makes her hyperaware that one wrong combination could throw everything off. Every three months she brings this spreadsheet to her endocrinologist, who politely skims it but appreciates her diligence.",
+      hiddenNeed: "Priya lives in the gap between two health systems that don't talk to each other. Her endocrinologist doesn't know (or ask) about her Ayurvedic supplements. Her mother doesn't understand why levothyroxine timing matters. Her hidden need is integration — a system or brand that bridges Western pharmacology and traditional medicine with real interaction data, validated timing protocols, and respect for both frameworks. No brand currently occupies this space.",
+      journeyStages: [
+        { stage: "Diagnosis", description: "Hashimoto's confirmed after years of unexplained fatigue", emotion: "Overwhelmed but relieved", color: "#E17055" },
+        { stage: "Medication", description: "Starts levothyroxine, learns the rigid timing rules", emotion: "Disciplined", color: "#D63031" },
+        { stage: "Seek More", description: "Medication helps but fatigue persists — explores supplements", emotion: "Frustrated, hopeful", color: "#FECA57" },
+        { stage: "Dual Research", description: "Cross-references clinical studies with Ayurvedic texts from her mother", emotion: "Conflicted", color: "#48DBFB" },
+        { stage: "Careful Addition", description: "Adds D3 and selenium after endocrinologist approval, ashwagandha on her own", emotion: "Cautiously optimistic", color: "#10AC84" },
+        { stage: "Ongoing Negotiation", description: "Continuously balancing both systems, adjusting timing, monitoring labs", emotion: "Vigilant but hopeful", color: "#A29BFE" }
+      ]
+    },
+    pxImplications: {
+      research: "Autoimmune consumers have fundamentally different evaluation criteria — drug interaction safety trumps everything. Research must include interaction studies and timing protocols, not just efficacy data.",
+      design: "Packaging must prominently display: gluten-free, soy-free, and medication interaction guidance. A 'safe with thyroid medication' callout would be the single most powerful claim for this segment.",
+      packaging: "Timing guidance ON the package — not buried in a pamphlet. 'Take 60 minutes after thyroid medication' printed on the front panel. Consider color-coded timing system across product line.",
+      agentReadiness: "Agent data needs pharmaceutical interaction databases, absorption timing windows, autoimmune trigger ingredient lists, and dual-framework evidence (clinical + traditional). This data layer barely exists — building it would be a significant competitive advantage."
+    }
   }
 ];
 
@@ -372,6 +415,9 @@ export const LOOP_MESSAGES = [
   { text: "Running diversity check — geographic spread validation", type: "diversity" },
   { text: "Generating persona: Budget-Conscious Student archetype", type: "generate", personaIndex: 7 },
   { text: "Verifying proxy-purchaser behavior model", type: "verify", personaIndex: 7 },
+  { text: "Running diversity check — chronic condition representation", type: "diversity" },
+  { text: "Generating persona: Chronic Condition Navigator archetype", type: "generate", personaIndex: 8 },
+  { text: "Validating dual-framework health decision model", type: "verify", personaIndex: 8 },
   { text: "Final panel diversity validation — all checks passed", type: "complete" },
-  { text: "8 synthetic personas generated — panel ready for review", type: "complete" }
+  { text: "9 synthetic personas generated — panel ready for review", type: "complete" }
 ];

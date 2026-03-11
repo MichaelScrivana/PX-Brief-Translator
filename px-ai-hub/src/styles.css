@@ -12,6 +12,7 @@
   --text-2: #a1a1a6;
   --text-3: #6e6e73;
   --accent: #0071e3;
+  --mono: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
 }
 
 /* ── Base ── */
@@ -68,7 +69,8 @@ html, body, #root {
 }
 
 .hub-header-badge {
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-3);
   padding: 4px 12px;
@@ -78,6 +80,26 @@ html, body, #root {
 
 /* ── Hero ── */
 .hub-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  overflow: hidden;
+}
+
+.hub-hero-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hub-hero-content {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,9 +109,24 @@ html, body, #root {
 }
 
 .hub-hero-logo {
-  height: 48px;
+  height: 71px;
   object-fit: contain;
   margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 20px rgba(0, 113, 227, 0.3));
+}
+
+.hub-hero-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  width: 300px;
+  height: 200px;
+  background: radial-gradient(ellipse, rgba(0, 113, 227, 0.12) 0%, rgba(0, 199, 255, 0.05) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .hub-tagline-container {
@@ -119,12 +156,24 @@ html, body, #root {
 }
 
 .hub-hero-sub {
-  font-size: 15px;
+  font-family: var(--mono);
+  font-size: 13px;
   font-weight: 400;
   color: var(--text-3);
   max-width: 560px;
-  line-height: 1.6;
+  line-height: 1.7;
   margin-top: 8px;
+}
+
+.hub-typing-cursor {
+  color: var(--accent);
+  animation: blink 0.8s step-end infinite;
+  font-weight: 300;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* ── Grid Section ── */
@@ -166,10 +215,38 @@ html, body, #root {
   pointer-events: none;
 }
 
-.hub-card-accent {
-  height: 4px;
+.hub-card-accent-wrap {
+  position: relative;
+  height: 2px;
   width: 100%;
-  transition: opacity 0.3s ease;
+  overflow: hidden;
+}
+
+.hub-card-accent {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent-from), var(--accent-to), transparent);
+  opacity: 0.5;
+  transition: opacity 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hub-card-accent-active {
+  opacity: 1;
+  box-shadow: 0 0 12px var(--accent-from), 0 0 24px var(--accent-to);
+}
+
+@keyframes accent-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+.hub-card-accent {
+  animation: accent-pulse 3s ease-in-out infinite;
+}
+
+.hub-card-accent-active {
+  animation: none;
+  opacity: 1;
 }
 
 .hub-card-body {
@@ -220,7 +297,8 @@ html, body, #root {
 }
 
 .hub-card-badge-soon {
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 10px;
   font-weight: 500;
   color: var(--text-3);
   padding: 3px 10px;
@@ -245,7 +323,8 @@ html, body, #root {
 }
 
 .hub-card-tag {
-  font-size: 11px;
+  font-family: var(--mono);
+  font-size: 10px;
   font-weight: 500;
   padding: 4px 10px;
   border-radius: 980px;
@@ -260,7 +339,8 @@ html, body, #root {
   gap: 8px;
   padding: 24px 32px;
   border-top: 1px solid var(--border);
-  font-size: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
   color: var(--text-3);
 }
 
@@ -275,7 +355,20 @@ html, body, #root {
   }
 
   .hub-hero {
+    min-height: 320px;
+  }
+
+  .hub-hero-content {
     padding: 60px 24px 40px;
+  }
+
+  .hub-hero-logo {
+    height: 40px;
+  }
+
+  .hub-hero-glow {
+    width: 200px;
+    height: 140px;
   }
 
   .hub-tagline {

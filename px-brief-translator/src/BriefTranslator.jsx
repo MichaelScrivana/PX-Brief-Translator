@@ -245,9 +245,9 @@ export default function BriefTranslator() {
             </div>
           )}
 
-          {/* Nav link to Persona Generator */}
+          {/* Nav links */}
           <a
-            href="https://px-persona-generator.azurestaticapps.net"
+            href="https://calm-mushroom-0cfaf7f0f.1.azurestaticapps.net"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-nav-link"

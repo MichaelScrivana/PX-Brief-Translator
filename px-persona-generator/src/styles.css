@@ -47,6 +47,66 @@ body {
 }
 
 /* ══════════════════════════════════════════════
+   NAV HEADER
+   ══════════════════════════════════════════════ */
+
+.pg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.pg-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pg-header-logo {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  filter: invert(1);
+}
+
+.pg-header-title {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--white);
+}
+
+.pg-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pg-header-badge {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--grey-600);
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
+}
+
+@media (max-width: 700px) {
+  .pg-header {
+    padding: 12px 16px;
+  }
+}
+
+/* ══════════════════════════════════════════════
    LOOP MONITOR — White stage, top half
    ══════════════════════════════════════════════ */
 
@@ -107,10 +167,10 @@ body {
   transform: translateY(12px);
 }
 
-.loop-status-line[data-type="generate"] { color: var(--grey-600); }
-.loop-status-line[data-type="verify"] { color: var(--success); }
-.loop-status-line[data-type="diversity"] { color: var(--purple); }
-.loop-status-line[data-type="system"] { color: var(--grey-500); }
+.loop-status-line[data-type="generate"],
+.loop-status-line[data-type="verify"],
+.loop-status-line[data-type="diversity"],
+.loop-status-line[data-type="system"],
 .loop-status-line[data-type="complete"] { color: var(--black); font-weight: 500; }
 
 /* Progress dots */

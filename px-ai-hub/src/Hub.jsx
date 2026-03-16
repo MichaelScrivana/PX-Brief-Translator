@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./styles.css";
+import PXAgent from "./PXAgent";
+import "./pxagent.css";
 
 // ── Neural Network Hero Component ──
 function NeuralHero({ tagline, taglineFade }) {
@@ -353,10 +355,55 @@ const ArrowIcon = () => (
 
 const ICONS = { doc: DocIcon, user: UserIcon, sparkle: SparkleIcon };
 
+// ── Hamburger Icon ──
+const HamburgerIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+);
+
+const CloseMenuIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+const SunIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="5" />
+    <line x1="12" y1="1" x2="12" y2="3" />
+    <line x1="12" y1="21" x2="12" y2="23" />
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+    <line x1="1" y1="12" x2="3" y2="12" />
+    <line x1="21" y1="12" x2="23" y2="12" />
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+);
+
+const AI_HUB_URL = "https://salmon-island-0f8fa491e.4.azurestaticapps.net";
+
+const NAV_LINKS = [
+  { name: "Brief Translator", url: "https://proud-moss-0a781bf03.1.azurestaticapps.net" },
+  { name: "Persona Generator", url: "https://calm-mushroom-0cfaf7f0f.1.azurestaticapps.net" },
+];
+
 export default function Hub() {
   const [taglineIndex, setTaglineIndex] = useState(0);
   const [taglineFade, setTaglineFade] = useState("in");
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -370,17 +417,50 @@ export default function Hub() {
   }, []);
 
   return (
-    <div className="hub">
+    <div className={`hub ${darkMode ? "dark" : "light"}`}>
       {/* ── Header ── */}
       <header className="hub-header">
         <div className="hub-header-left">
-          <img src="/img/PX-logo-blk@3x.png" alt="PX" className="hub-logo" />
+          <a href={AI_HUB_URL} className="hub-home-link" title="PX AI Hub Home">
+            <img src="/img/PX-logo-blk@3x.png" alt="PX" className="hub-logo" />
+          </a>
           <span className="hub-header-title">AI Hub</span>
         </div>
         <div className="hub-header-right">
           <span className="hub-header-badge">{TOOLS.filter(t => t.status === "live").length} tools live</span>
+          <button className="hub-theme-toggle" onClick={() => setDarkMode(!darkMode)} title={darkMode ? "Light mode" : "Dark mode"}>
+            {darkMode ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <button className="hub-menu-btn" onClick={() => setMenuOpen(!menuOpen)} title="Menu">
+            {menuOpen ? <CloseMenuIcon /> : <HamburgerIcon />}
+          </button>
         </div>
       </header>
+
+      {/* ── Dropdown Menu ── */}
+      {menuOpen && (
+        <div className="hub-menu-overlay" onClick={() => setMenuOpen(false)}>
+          <nav className="hub-menu" onClick={(e) => e.stopPropagation()}>
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hub-menu-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.name}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
 
       {/* ── Hero ── */}
       <NeuralHero tagline={TAGLINES[taglineIndex]} taglineFade={taglineFade} />
@@ -466,6 +546,8 @@ export default function Hub() {
         <span className="hub-footer-dot">&bull;</span>
         <span>Bayer Consumer Health</span>
       </footer>
+
+      <PXAgent />
     </div>
   );
 }

@@ -4,7 +4,15 @@ import { SYSTEM_PROMPTS } from "./systemPrompts";
 import { SAMPLE_BRIEF } from "./sampleBrief";
 import DropZone from "./DropZone";
 import ChatAgent from "./ChatAgent";
+import PXAgent from "./PXAgent";
 import "./styles.css";
+import "./pxagent.css";
+
+const AI_HUB_URL = "https://salmon-island-0f8fa491e.4.azurestaticapps.net";
+
+const NAV_LINKS = [
+  { name: "Persona Generator", url: "https://calm-mushroom-0cfaf7f0f.1.azurestaticapps.net" },
+];
 
 // ── Animated tagline phrases ──
 const TAGLINES = [
@@ -67,6 +75,7 @@ export default function BriefTranslator() {
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [error, setError] = useState("");
   const [darkMode, setDarkMode] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // ── API Configuration ──
   const [showConfig, setShowConfig] = useState(false);
@@ -223,16 +232,14 @@ export default function BriefTranslator() {
       {/* ── Header ── */}
       <header className="header">
         <div className="header-left">
-          <img
-            src="/img/PX-logo-blk@3x.png"
-            alt="PX"
-            className="logo-circle"
-          />
-          <div className="header-divider" />
-          <div>
-            <div className="header-title">Brief Translator</div>
-            <div className="header-subtitle">Agent Workflow</div>
-          </div>
+          <a href={AI_HUB_URL} className="header-home-link" title="PX AI Hub Home">
+            <img
+              src="/img/PX-logo-blk@3x.png"
+              alt="PX"
+              className="logo-circle"
+            />
+          </a>
+          <span className="header-title">AI Hub</span>
         </div>
 
         <div className="header-right">
@@ -245,32 +252,57 @@ export default function BriefTranslator() {
             </div>
           )}
 
-          {/* Nav links */}
-          <a
-            href="https://calm-mushroom-0cfaf7f0f.1.azurestaticapps.net"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-nav-link"
-            title="Persona Generator"
-          >
-            Persona Generator
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4 }}>
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
-            </svg>
-          </a>
+          <span className="header-badge">Brief Translator</span>
 
-          {/* Dark mode toggle */}
           <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)} title={darkMode ? "Light mode" : "Dark mode"}>
             {darkMode ? <SunIcon /> : <MoonIcon />}
           </button>
 
-          <button className="btn btn-config" onClick={() => setShowConfig(!showConfig)} title="API Configuration">
-            {configSaved ? `\u2713 ${providerLabel}` : "API Setup"}
+          <button className="header-menu-btn" onClick={() => setMenuOpen(!menuOpen)} title="Menu">
+            {menuOpen ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
           </button>
         </div>
       </header>
+
+      {/* ── Dropdown Menu ── */}
+      {menuOpen && (
+        <div className="header-menu-overlay" onClick={() => setMenuOpen(false)}>
+          <nav className="header-menu" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="header-menu-item"
+              onClick={() => { setShowConfig(!showConfig); setMenuOpen(false); }}
+              style={{ width: "100%", border: "none", background: "none", cursor: "pointer", textAlign: "left", fontFamily: "inherit" }}
+            >
+              {configSaved ? `\u2713 ${providerLabel}` : "API Setup"}
+            </button>
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="header-menu-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.name}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
 
       <main className="main">
         {/* ── Config Panel ── */}
@@ -435,6 +467,24 @@ export default function BriefTranslator() {
           <DropZone onTextExtracted={(text) => setBrief(text)}>
             <textarea value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Paste your project brief here, drag a file, or load the sample..." className="brief-input" />
           </DropZone>
+
+          {/* ── Brief-specific Chat Agent ── */}
+          <ChatAgent
+            brief={brief}
+            outputs={outputs}
+            subHomes={SUB_HOMES}
+            provider={provider}
+            darkMode={darkMode}
+            apiConfig={{
+              bayerToken,
+              bayerModel,
+              bayerAssistants: bayerAssistants.filter((a) => a.id.trim()),
+              azureEndpoint,
+              azureDeployment,
+              azureApiVersion,
+              apiKey,
+            }}
+          />
         </section>
 
         {/* ── Sub-home folder tabs (3×2 grid) ── */}
@@ -493,23 +543,7 @@ export default function BriefTranslator() {
         <footer className="footer">PX Brief Translator &bull; Powered by {providerLabel}</footer>
       </main>
 
-      {/* ── Chat Agent ── */}
-      <ChatAgent
-        brief={brief}
-        outputs={outputs}
-        subHomes={SUB_HOMES}
-        provider={provider}
-        darkMode={darkMode}
-        apiConfig={{
-          bayerToken,
-          bayerModel,
-          bayerAssistants: bayerAssistants.filter((a) => a.id.trim()),
-          azureEndpoint,
-          azureDeployment,
-          azureApiVersion,
-          apiKey,
-        }}
-      />
+      <PXAgent />
     </div>
   );
 }

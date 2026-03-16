@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { PERSONAS, LOOP_MESSAGES } from "./personas";
 import "./styles.css";
+import PXAgent from "./PXAgent";
+import "./pxagent.css";
 
 // ══════════════════════════════════════════════
 // PersonaGenerator V4
@@ -8,6 +10,12 @@ import "./styles.css";
 // Georgia serif header, animated fading status lines
 // Deep dive with journey timeline + Test a Concept
 // ══════════════════════════════════════════════
+
+const AI_HUB_URL = "https://salmon-island-0f8fa491e.4.azurestaticapps.net";
+
+const NAV_LINKS = [
+  { name: "Brief Translator", url: "https://proud-moss-0a781bf03.1.azurestaticapps.net" },
+];
 
 export default function PersonaGenerator() {
   // ── State ──
@@ -23,6 +31,8 @@ export default function PersonaGenerator() {
 
   // ── API Config ──
   const [showConfig, setShowConfig] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [provider, setProvider] = useState("anthropic");
   const [apiKey, setApiKey] = useState("");
   const [bayerToken, setBayerToken] = useState("");
@@ -390,17 +400,74 @@ Evaluate the following product concept/claim/message through this persona's eyes
   // RENDER: Main View
   // ══════════════════════════════════════════════
   return (
-    <div>
-      {/* ── Header (matches AI Hub) ── */}
+    <div className={`pg-app ${darkMode ? "dark" : "light"}`}>
+      {/* ── Header ── */}
       <header className="pg-header">
         <div className="pg-header-left">
-          <img src="/img/PX-logo-blk@3x.png" alt="PX" className="pg-header-logo" />
+          <a href={AI_HUB_URL} className="pg-home-link" title="PX AI Hub Home">
+            <img src="/img/PX-logo-blk@3x.png" alt="PX" className="pg-header-logo" />
+          </a>
           <span className="pg-header-title">AI Hub</span>
         </div>
         <div className="pg-header-right">
           <span className="pg-header-badge">Persona Generator</span>
+          <button className="pg-theme-toggle" onClick={() => setDarkMode(!darkMode)} title={darkMode ? "Light mode" : "Dark mode"}>
+            {darkMode ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            )}
+          </button>
+          <button className="pg-menu-btn" onClick={() => setMenuOpen(!menuOpen)} title="Menu">
+            {menuOpen ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
+          </button>
         </div>
       </header>
+
+      {/* ── Dropdown Menu ── */}
+      {menuOpen && (
+        <div className="pg-menu-overlay" onClick={() => setMenuOpen(false)}>
+          <nav className="pg-menu" onClick={(e) => e.stopPropagation()}>
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pg-menu-item"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.name}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
 
       {/* ── Loop Monitor (White) ── */}
       <div className="loop-monitor">
@@ -652,6 +719,8 @@ Evaluate the following product concept/claim/message through this persona's eyes
           </div>
         </div>
       )}
+
+      <PXAgent />
     </div>
   );
 }

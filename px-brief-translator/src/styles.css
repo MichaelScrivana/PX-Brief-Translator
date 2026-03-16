@@ -74,7 +74,7 @@
 /* ── Header ── */
 .header {
   background: var(--surface);
-  padding: 14px 40px;
+  padding: 16px 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -108,24 +108,90 @@
   filter: invert(1);
 }
 
-.header-divider {
-  width: 1px;
-  height: 28px;
-  background: var(--border-s);
-  margin: 0 2px;
-}
-
 .header-title {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.01em;
 }
 
-.header-subtitle {
-  color: var(--text-muted);
+.header-badge {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
   font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 980px;
+}
+
+.header-home-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.header-menu-btn {
+  background: none;
+  border: 1px solid var(--border-s);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.header-menu-btn:hover {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+
+.header-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+}
+
+.header-menu {
+  position: fixed;
+  top: 60px;
+  right: 40px;
+  background: var(--surface);
+  border: 1px solid var(--border-s);
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 200px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+}
+
+.app.dark .header-menu {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.header-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: 0.01em;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.header-menu-item:hover {
+  color: var(--text);
+  background: var(--surface-2);
 }
 
 /* ── Theme toggle ── */

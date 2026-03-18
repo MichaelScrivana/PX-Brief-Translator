@@ -1,13 +1,13 @@
 /* ── PX Persona Generator V4 ── */
 /* White loop monitor + dark persona cards, Apple-minimal aesthetic */
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto:wght@300;400;500;700&display=swap');
 
 /* ── Reset ── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --serif: Georgia, 'Times New Roman', serif;
+  --serif: 'DM Serif Display', Georgia, serif;
   --sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
   --white: #ffffff;
   --black: #000000;

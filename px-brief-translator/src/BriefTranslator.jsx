@@ -4,9 +4,8 @@ import { SYSTEM_PROMPTS } from "./systemPrompts";
 import { SAMPLE_BRIEF } from "./sampleBrief";
 import DropZone from "./DropZone";
 import ChatAgent from "./ChatAgent";
-import PXAgent from "./PXAgent";
+import { DEMO_OUTPUTS } from "./demoOutputs";
 import "./styles.css";
-import "./pxagent.css";
 
 const AI_HUB_URL = "https://salmon-island-0f8fa491e.4.azurestaticapps.net";
 
@@ -74,7 +73,7 @@ export default function BriefTranslator() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [error, setError] = useState("");
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   // ── API Configuration ──
@@ -205,20 +204,33 @@ export default function BriefTranslator() {
     return apiKey.trim();
   };
 
+  const isDemo = !isConfigValid();
+
   const translateAll = async () => {
     if (!brief.trim()) return setError("Paste or load a project brief first.");
-    if (!isConfigValid()) { setShowConfig(true); return setError("Please configure your API connection first."); }
     setError(""); setLoading(true); setOutputs({}); setProgress({ done: 0, total: SUB_HOMES.length });
-    for (let i = 0; i < SUB_HOMES.length; i++) {
-      const sh = SUB_HOMES[i];
-      try {
-        const result = await translateSingle(sh.id, brief);
-        setOutputs((prev) => ({ ...prev, [sh.id]: result }));
+
+    if (isDemo) {
+      // Demo mode — simulate translation with sample outputs
+      for (let i = 0; i < SUB_HOMES.length; i++) {
+        const sh = SUB_HOMES[i];
+        await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
+        setOutputs((prev) => ({ ...prev, [sh.id]: DEMO_OUTPUTS[sh.id] || "Demo output not available." }));
         setProgress((prev) => ({ ...prev, done: prev.done + 1 }));
         if (i === 0) setActiveTab(sh.id);
-      } catch (e) {
-        setOutputs((prev) => ({ ...prev, [sh.id]: `Error: ${e.message}` }));
-        setProgress((prev) => ({ ...prev, done: prev.done + 1 }));
+      }
+    } else {
+      for (let i = 0; i < SUB_HOMES.length; i++) {
+        const sh = SUB_HOMES[i];
+        try {
+          const result = await translateSingle(sh.id, brief);
+          setOutputs((prev) => ({ ...prev, [sh.id]: result }));
+          setProgress((prev) => ({ ...prev, done: prev.done + 1 }));
+          if (i === 0) setActiveTab(sh.id);
+        } catch (e) {
+          setOutputs((prev) => ({ ...prev, [sh.id]: `Error: ${e.message}` }));
+          setProgress((prev) => ({ ...prev, done: prev.done + 1 }));
+        }
       }
     }
     setLoading(false);
@@ -443,14 +455,10 @@ export default function BriefTranslator() {
 
         {error && <div className="error-banner">{error}</div>}
 
-        {/* ── Hero: logo + animated tagline ── */}
-        <div className="hero">
-          <img
-            src={darkMode ? "/img/WeArePX1-wht@3x.png" : "/img/WeArePX1@3x.png"}
-            alt="We Are PX"
-            className="hero-logo"
-          />
-          <AnimatedTagline />
+        {/* ── Overview ── */}
+        <div className="overview">
+          <h1 className="overview-title">Brief Translator</h1>
+          <p className="overview-subtitle">Paste or upload a project brief and instantly translate it into tailored working briefs for each of the 6 PX sub-homes — Research, Brand, Product, Innovation, Engineering, and Graphics.</p>
         </div>
 
         {/* ── Brief input ── */}
@@ -464,8 +472,8 @@ export default function BriefTranslator() {
               </button>
             </div>
           </div>
-          <DropZone onTextExtracted={(text) => setBrief(text)}>
-            <textarea value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Paste your project brief here, drag a file, or load the sample..." className="brief-input" />
+          <DropZone onTextExtracted={(text) => setBrief(text)} hasContent={!!brief.trim()}>
+            <textarea value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Paste your project brief here..." className="brief-input" />
           </DropZone>
 
           {/* ── Brief-specific Chat Agent ── */}
@@ -522,7 +530,7 @@ export default function BriefTranslator() {
                       <span className="output-icon">{SUB_HOMES.find((s) => s.id === activeTab)?.icon}</span>
                       <div>
                         <div className="output-title">{SUB_HOMES.find((s) => s.id === activeTab)?.label} Working Brief</div>
-                        <div className="output-subtitle">Agent-generated via {providerLabel}</div>
+                        <div className="output-subtitle">{isDemo ? "Demo mode — sample output" : `Agent-generated via ${providerLabel}`}</div>
                       </div>
                     </div>
                     <div className="markdown-body" dangerouslySetInnerHTML={{ __html: markdownToHtml(outputs[activeTab]) }} />
@@ -540,10 +548,9 @@ export default function BriefTranslator() {
           </>
         )}
 
-        <footer className="footer">PX Brief Translator &bull; Powered by {providerLabel}</footer>
+        <footer className="footer">PX Brief Translator &bull; {isDemo ? "Demo Mode" : `Powered by ${providerLabel}`}</footer>
       </main>
 
-      <PXAgent />
     </div>
   );
 }

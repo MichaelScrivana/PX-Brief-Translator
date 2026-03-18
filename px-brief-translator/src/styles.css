@@ -1,8 +1,9 @@
-/* ── Roboto ── */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+/* ── Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto:wght@300;400;500;700&display=swap');
 
 /* ── CSS Variables (Light + Dark) ── */
 :root, .app {
+  --serif:      'DM Serif Display', Georgia, serif;
   --bg:         #f5f5f7;
   --surface:    #ffffff;
   --surface-2:  #fafafa;
@@ -263,6 +264,27 @@
   object-fit: contain;
 }
 
+.overview {
+  text-align: center;
+  padding: 40px 20px 16px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.overview-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+
+.overview-subtitle {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
 /* ── Animated Tagline ── */
 .tagline-container {
   text-align: center;
@@ -276,7 +298,7 @@
 .tagline {
   font-size: 20px;
   font-weight: 400;
-  font-family: serif;
+  font-family: var(--serif);
   color: var(--text-muted);
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
@@ -367,35 +389,55 @@
   width: 100%;
   min-height: 180px;
   padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border-s);
+  border-radius: 0;
+  border: none;
   font-size: 14px;
   line-height: 1.7;
   resize: vertical;
   outline: none;
   font-family: inherit;
-  background: var(--input-bg);
+  background: transparent;
   color: var(--text);
   transition: all 0.2s ease;
 }
 .brief-input::placeholder { color: var(--text-faint); }
 .brief-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
-  background: var(--surface);
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
 }
 
 /* ── Drop Zone ── */
-.dropzone { position: relative; }
+.dropzone {
+  position: relative;
+  border-radius: 16px;
+  padding: 3px;
+  background:
+    linear-gradient(var(--card-bg, var(--surface)), var(--card-bg, var(--surface))) padding-box,
+    linear-gradient(135deg, #0071e3, #00c7ff) border-box;
+  border: 2px solid transparent;
+  transition: box-shadow 0.3s ease;
+}
+.dropzone:hover {
+  box-shadow: 0 4px 20px rgba(0, 113, 227, 0.12);
+}
+.dropzone-inner {
+  background: var(--card-bg, var(--surface));
+  border-radius: 13px;
+  overflow: hidden;
+}
+.dropzone-active {
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15), 0 8px 30px rgba(0, 113, 227, 0.2);
+}
 .dropzone-active .brief-input {
-  border-color: var(--accent);
+  border-color: transparent;
   background: var(--accent-bg);
 }
 .dropzone-overlay {
   position: absolute; inset: 0;
   background: var(--overlay-bg);
   backdrop-filter: blur(8px);
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
   z-index: 10;
   border: 2px dashed var(--accent);
@@ -411,14 +453,14 @@
 }
 .dropzone-file-bar {
   display: flex; align-items: center; gap: 8px;
-  padding: 10px 14px; margin-bottom: 10px;
+  padding: 10px 14px; margin: 4px 4px 0;
   background: var(--file-bar); border-radius: 10px;
   font-size: 12px; color: var(--text-3);
 }
 .dropzone-file-bar strong { color: var(--text); font-weight: 500; }
 .dropzone-error-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; margin-bottom: 10px;
+  padding: 10px 14px; margin: 4px 4px 0;
   background: var(--error-bar); border-radius: 10px;
   font-size: 12px; color: var(--danger);
 }
@@ -430,8 +472,10 @@
 }
 .dropzone-clear:hover { background: var(--accent-bg); color: var(--text); }
 .dropzone-hint {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 10px; font-size: 12px; color: var(--text-faint);
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 12px; color: var(--text-faint);
 }
 .dropzone-browse {
   background: none; border: none; color: var(--accent);
@@ -439,7 +483,49 @@
   padding: 0; font-family: inherit;
 }
 .dropzone-browse:hover { text-decoration: underline; }
-.dropzone-formats { font-size: 11px; color: var(--text-faint); letter-spacing: 0.02em; }
+.dropzone-formats {
+  font-size: 11px; color: var(--text-faint); letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+/* ── Centered upload prompt ── */
+.dropzone-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  cursor: pointer;
+  min-height: 200px;
+}
+.dropzone-prompt-icon {
+  color: #0071e3;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.dropzone-prompt:hover .dropzone-prompt-icon {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+.dropzone-prompt-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, var(--text-muted));
+}
+.dropzone-prompt-browse {
+  color: #0071e3;
+  font-weight: 600;
+}
+.dropzone-prompt-browse:hover {
+  text-decoration: underline;
+}
+.dropzone-prompt-formats {
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
 
 /* ── Error ── */
 .error-banner {
@@ -546,7 +632,8 @@
 }
 .output-icon { font-size: 24px; }
 .output-title {
-  font-size: 16px; font-weight: 500;
+  font-family: var(--serif);
+  font-size: 18px; font-weight: 400;
   color: var(--text); letter-spacing: -0.01em;
 }
 .output-subtitle {
@@ -555,9 +642,9 @@
 }
 
 /* ── Markdown ── */
-.markdown-body h1 { font-size: 18px; font-weight: 500; color: var(--text); margin: 24px 0 10px; }
-.markdown-body h2 { font-size: 15px; font-weight: 500; color: var(--text); margin: 20px 0 8px; }
-.markdown-body h3 { font-size: 14px; font-weight: 500; color: var(--text-3); margin: 18px 0 6px; }
+.markdown-body h1 { font-family: var(--serif); font-size: 20px; font-weight: 400; color: var(--text); margin: 24px 0 10px; }
+.markdown-body h2 { font-family: var(--serif); font-size: 17px; font-weight: 400; color: var(--text); margin: 20px 0 8px; }
+.markdown-body h3 { font-family: var(--serif); font-size: 15px; font-weight: 400; color: var(--text-3); margin: 18px 0 6px; }
 .markdown-body p  { margin: 5px 0; }
 .markdown-body strong { font-weight: 500; color: var(--text); }
 .markdown-body .bullet { display: flex; gap: 10px; margin: 5px 0; padding-left: 4px; }

@@ -114,7 +114,7 @@ function getHandlerByExtension(filename) {
   return extMap[ext] || null;
 }
 
-export default function DropZone({ onTextExtracted, children }) {
+export default function DropZone({ onTextExtracted, children, hasContent }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [fileName, setFileName] = useState("");
@@ -283,17 +283,21 @@ export default function DropZone({ onTextExtracted, children }) {
         </div>
       )}
 
-      {children}
-
-      <div className="dropzone-hint">
-        <span>
-          Drag &amp; drop a file here, or{" "}
-          <button className="dropzone-browse" onClick={openFilePicker}>
-            browse
-          </button>
-        </span>
-        <span className="dropzone-formats">PDF, DOCX, TXT, MD, CSV</span>
-      </div>
+      {hasContent ? (
+        children
+      ) : (
+        <div className="dropzone-prompt" onClick={openFilePicker}>
+          <svg className="dropzone-prompt-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span className="dropzone-prompt-text">
+            Drag & drop a file here, or <span className="dropzone-prompt-browse">browse</span>
+          </span>
+          <span className="dropzone-prompt-formats">PDF, DOCX, TXT, MD, CSV</span>
+        </div>
+      )}
     </div>
   );
 }

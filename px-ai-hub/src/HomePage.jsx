@@ -355,6 +355,16 @@ export default function HomePage({ darkMode }) {
             </p>
           </Reveal>
 
+          <Reveal delay={200}>
+            <a
+              href="https://px.int.bayer.com/"
+              rel="noopener noreferrer"
+              className="hub-about-link"
+            >
+              Learn more about PX — go/PX ↗
+            </a>
+          </Reveal>
+
           <div className="hub-features">
             {FEATURES.map((f, i) => {
               const Icon = f.icon;

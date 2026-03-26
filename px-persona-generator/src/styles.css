@@ -47,17 +47,8 @@ body {
 }
 
 /* ── Light mode overrides ── */
+/* NOTE: Do NOT swap --black/--white variables — use explicit overrides instead */
 .pg-app.light {
-  --black: #f5f5f7;
-  --white: #1d1d1f;
-  --grey-100: #1d1d1f;
-  --grey-200: #424245;
-  --grey-300: #6e6e73;
-  --grey-400: #86868b;
-  --grey-500: #aeaeb2;
-  --grey-600: #86868b;
-  --grey-700: #d2d2d7;
-  --grey-800: #f5f5f7;
   --surface-dark: #ffffff;
   --surface-dark-2: #fafafa;
   --surface-dark-3: #f0f0f0;
@@ -69,51 +60,88 @@ body {
   background: #f5f5f7;
   color: #1d1d1f;
 }
+
+/* Header */
 .pg-app.light .pg-header {
   background: rgba(255, 255, 255, 0.85);
   border-bottom-color: rgba(0, 0, 0, 0.08);
 }
-.pg-app.light .pg-header-logo {
-  filter: none;
-}
-.pg-app.light .pg-menu-btn {
-  border-color: rgba(0, 0, 0, 0.12);
-  color: #86868b;
-}
-.pg-app.light .pg-menu-btn:hover {
-  color: #1d1d1f;
-  border-color: rgba(0, 0, 0, 0.2);
-  background: rgba(0, 0, 0, 0.04);
-}
-.pg-app.light .pg-header-badge {
-  border-color: rgba(0, 0, 0, 0.12);
-  color: #86868b;
-}
-.pg-app.light .pg-menu {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-}
-.pg-app.light .pg-menu-item {
-  color: #86868b;
-}
-.pg-app.light .pg-menu-item:hover {
-  color: #1d1d1f;
-  background: rgba(0, 0, 0, 0.04);
-}
-.pg-app.light .loop-monitor {
-  background: #f5f5f7;
-}
-.pg-app.light .persona-card {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
-}
-.pg-app.light .persona-card:hover {
-  border-color: rgba(0, 0, 0, 0.15);
-}
-.pg-app.light .persona-grid {
-  background: #f0f0f0;
-}
+.pg-app.light .pg-header-logo { filter: none; }
+.pg-app.light .pg-header-title { color: #1d1d1f; }
+.pg-app.light .pg-menu-btn { border-color: rgba(0,0,0,0.12); color: #86868b; }
+.pg-app.light .pg-menu-btn:hover { color: #1d1d1f; border-color: rgba(0,0,0,0.2); background: rgba(0,0,0,0.04); }
+.pg-app.light .pg-header-badge { border-color: rgba(0,0,0,0.12); color: #86868b; }
+.pg-app.light .pg-menu { background: #ffffff; border-color: rgba(0,0,0,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.pg-app.light .pg-menu-item { color: #86868b; }
+.pg-app.light .pg-menu-item:hover { color: #1d1d1f; background: rgba(0,0,0,0.04); }
+
+/* Loop monitor */
+.pg-app.light .loop-monitor { background: #ffffff; }
+.pg-app.light .loop-header { color: #1d1d1f; }
+.pg-app.light .loop-status-line { color: #86868b; }
+.pg-app.light .loop-dot { background: #d2d2d7; }
+.pg-app.light .loop-dot.filled { background: #1d1d1f; }
+.pg-app.light .loop-dot.active { background: #86868b; }
+.pg-app.light .loop-btn-start { background: #1d1d1f; color: #ffffff; }
+.pg-app.light .loop-btn-reset { color: #86868b; border-color: #d2d2d7; }
+.pg-app.light .loop-btn-reset:hover { color: #1d1d1f; border-color: #86868b; }
+.pg-app.light .config-btn { border-color: rgba(0,0,0,0.12); color: #86868b; }
+.pg-app.light .config-btn:hover { color: #1d1d1f; border-color: rgba(0,0,0,0.2); }
+
+/* Persona cards */
+.pg-app.light .persona-section { background: #f5f5f7; }
+.pg-app.light .persona-card { background: #ffffff; border-color: rgba(0,0,0,0.08); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.pg-app.light .persona-card:hover { border-color: rgba(0,0,0,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.pg-app.light .persona-name { color: #1d1d1f; }
+.pg-app.light .persona-meta { color: #86868b; }
+.pg-app.light .persona-expand-icon { border-color: rgba(0,0,0,0.12); color: #86868b; }
+.pg-app.light .persona-card:hover .persona-expand-icon { border-color: rgba(0,0,0,0.25); color: #1d1d1f; }
+.pg-app.light .persona-segment { background: rgba(0,0,0,0.04); color: #6e6e73; }
+.pg-app.light .persona-expanded { border-top-color: rgba(0,0,0,0.06); }
+.pg-app.light .persona-detail-label { color: #86868b; }
+.pg-app.light .persona-detail-text { color: #424245; }
+.pg-app.light .persona-deep-dive-btn { border-color: rgba(0,0,0,0.12); color: #1d1d1f; }
+.pg-app.light .persona-deep-dive-btn:hover { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.2); }
+
+/* Deep dive overlay */
+.pg-app.light .deep-dive-overlay { background: #ffffff; }
+.pg-app.light .deep-dive-back { background: rgba(255,255,255,0.85); border-bottom-color: rgba(0,0,0,0.08); }
+.pg-app.light .deep-dive-back-btn { border-color: rgba(0,0,0,0.12); color: #6e6e73; }
+.pg-app.light .deep-dive-back-btn:hover { color: #1d1d1f; border-color: rgba(0,0,0,0.25); }
+.pg-app.light .deep-dive-avatar { color: #ffffff; }
+.pg-app.light .deep-dive-name { color: #1d1d1f; }
+.pg-app.light .deep-dive-meta { color: #86868b; }
+.pg-app.light .deep-dive-quote { background: #f5f5f7; color: #424245; border-left-color: #aeaeb2; }
+.pg-app.light .deep-dive-section-title { color: #86868b; }
+.pg-app.light .deep-dive-section-text { color: #424245; }
+.pg-app.light .journey-stage-name { color: #1d1d1f; }
+.pg-app.light .journey-stage-desc { color: #86868b; }
+.pg-app.light .journey-emotion { color: #aeaeb2; }
+.pg-app.light .journey-dot { box-shadow: 0 0 8px rgba(0,0,0,0.08); }
+.pg-app.light .journey-line { background: rgba(0,0,0,0.08); }
+.pg-app.light .px-implication-card { background: #f5f5f7; }
+.pg-app.light .px-implication-label { color: #86868b; }
+.pg-app.light .px-implication-text { color: #424245; }
+
+/* Concept test */
+.pg-app.light .concept-test { border-top-color: rgba(0,0,0,0.08); }
+.pg-app.light .concept-test-title { color: #1d1d1f; }
+.pg-app.light .concept-test-input { border-color: rgba(0,0,0,0.12); background: #ffffff; color: #1d1d1f; }
+.pg-app.light .concept-test-input::placeholder { color: #aeaeb2; }
+.pg-app.light .concept-result { background: #f5f5f7; }
+.pg-app.light .concept-result-reaction { color: #424245; border-bottom-color: rgba(0,0,0,0.06); }
+.pg-app.light .concept-score-value { color: #1d1d1f; }
+.pg-app.light .concept-score-label { color: #86868b; }
+.pg-app.light .concept-score-bar { background: rgba(0,0,0,0.06); }
+.pg-app.light .concept-objection-label,
+.pg-app.light .concept-improvement-label { color: #86868b; }
+.pg-app.light .concept-objection-text,
+.pg-app.light .concept-improvement-text { color: #424245; }
+.pg-app.light .spinner { border-color: #e8e8ed; border-top-color: #0071e3; }
+
+/* Dark mode — ensure full dark background */
+.pg-app.dark .persona-section { background: #000000; }
+.pg-app.dark .loop-monitor { background: #ffffff; }
 
 /* ══════════════════════════════════════════════
    NAV HEADER
@@ -574,7 +602,7 @@ body {
    ══════════════════════════════════════════════ */
 
 .persona-section {
-  background: var(--black);
+  background: #f5f5f7;
   padding: 32px 20px 64px;
   min-height: 50vh;
 }

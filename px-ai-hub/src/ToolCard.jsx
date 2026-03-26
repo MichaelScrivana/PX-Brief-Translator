@@ -1,15 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ICONS, SparkleIcon, ArrowIcon } from "./tools";
+
+let teamsInitialized = false;
+let isInTeams = false;
+
+// Try to initialize Teams SDK once
+if (!teamsInitialized && window.microsoftTeams) {
+  try {
+    window.microsoftTeams.app.initialize().then(() => {
+      isInTeams = true;
+      teamsInitialized = true;
+    }).catch(() => {
+      teamsInitialized = true;
+    });
+  } catch {
+    teamsInitialized = true;
+  }
+}
 
 export default function ToolCard({ tool }) {
   const [hovered, setHovered] = useState(false);
   const IconComponent = ICONS[tool.icon] || SparkleIcon;
   const isComingSoon = tool.status === "coming-soon";
 
+  const handleClick = (e) => {
+    if (isComingSoon || !tool.url) return;
+    e.preventDefault();
+    // Navigate within the iframe instead of opening a new tab
+    window.location.href = tool.url;
+  };
+
   return (
     <a
       href={isComingSoon ? undefined : tool.url}
-      target="_blank"
+      onClick={handleClick}
       rel="noopener noreferrer"
       className={`hub-card ${isComingSoon ? "hub-card-soon" : ""}`}
       style={{

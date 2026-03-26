@@ -1,0 +1,47 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "82824e74-38ef-4198-b359-8793312a8d50",
+  "developer": {
+    "name": "Bayer PX",
+    "websiteUrl": "https://salmon-island-0f8fa491e.4.azurestaticapps.net",
+    "privacyUrl": "https://salmon-island-0f8fa491e.4.azurestaticapps.net",
+    "termsOfUseUrl": "https://salmon-island-0f8fa491e.4.azurestaticapps.net"
+  },
+  "name": {
+    "short": "PX AI Hub",
+    "full": "PX AI Hub — Product Experience AI Tools"
+  },
+  "description": {
+    "short": "Central hub for all PX AI-powered tools.",
+    "full": "The PX AI Hub is the central landing page for Bayer Product Experience AI tools, including the Brief Translator, Persona Generator, and more."
+  },
+  "icons": {
+    "color": "color-192x192.png",
+    "outline": "outline-32x32.png"
+  },
+  "accentColor": "#0071e3",
+  "staticTabs": [
+    {
+      "entityId": "px-ai-hub",
+      "name": "PX AI Hub",
+      "contentUrl": "https://salmon-island-0f8fa491e.4.azurestaticapps.net",
+      "websiteUrl": "https://salmon-island-0f8fa491e.4.azurestaticapps.net",
+      "scopes": ["personal"]
+    }
+  ],
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://salmon-island-0f8fa491e.4.azurestaticapps.net",
+      "canUpdateConfiguration": false,
+      "scopes": ["team", "groupChat"]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": [
+    "salmon-island-0f8fa491e.4.azurestaticapps.net",
+    "proud-moss-0a781bf03.1.azurestaticapps.net",
+    "calm-mushroom-0cfaf7f0f.1.azurestaticapps.net"
+  ]
+}

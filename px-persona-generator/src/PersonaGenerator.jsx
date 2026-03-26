@@ -32,7 +32,7 @@ export default function PersonaGenerator() {
   // ── API Config ──
   const [showConfig, setShowConfig] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [provider, setProvider] = useState("anthropic");
   const [apiKey, setApiKey] = useState("");
   const [bayerToken, setBayerToken] = useState("");

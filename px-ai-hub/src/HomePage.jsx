@@ -354,14 +354,13 @@ export default function HomePage({ darkMode }) {
               The PX AI Hub is Product Experience's toolkit for integrating artificial intelligence into everyday design and research workflows. Our mission is to make AI accessible, practical, and responsible — empowering teams to move faster without compromising quality.
             </p>
           </Reveal>
-
-          <Reveal delay={200}>
+          <Reveal delay={150}>
             <a
               href="https://px.int.bayer.com/"
               rel="noopener noreferrer"
               className="hub-about-link"
             >
-              Learn more about PX — go/PX ↗
+              More about the Product Experience Team ↗
             </a>
           </Reveal>
 
@@ -387,6 +386,7 @@ export default function HomePage({ darkMode }) {
               );
             })}
           </div>
+
         </div>
       </section>
 

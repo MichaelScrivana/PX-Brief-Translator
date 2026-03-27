@@ -22,16 +22,30 @@ function NeuralHero({ tagline, taglineFade, darkMode }) {
   const initNodes = useCallback((width, height) => {
     const count = width < 700 ? NODE_COUNT_MOBILE : NODE_COUNT_DESKTOP;
     const nodes = [];
+    const cx = width / 2;
+    const cy = height / 2;
     for (let i = 0; i < count; i++) {
+      // Spawn nodes along edges — left 25% or right 25% of the canvas
+      let x, y;
+      if (Math.random() < 0.5) {
+        // Left side
+        x = Math.random() * width * 0.3;
+      } else {
+        // Right side
+        x = width - Math.random() * width * 0.3;
+      }
+      y = Math.random() * height;
       nodes.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1,
-        baseRadius: Math.random() * 2 + 1,
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+        radius: Math.random() * 4 + 0.5,
+        baseRadius: Math.random() * 4 + 0.5,
         hue: Math.random() > 0.7 ? 190 : 210,
         pulse: Math.random() * Math.PI * 2,
+        homeX: x,
+        homeY: y,
       });
     }
     nodesRef.current = nodes;
@@ -105,37 +119,42 @@ function NeuralHero({ tagline, taglineFade, darkMode }) {
 
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
-        n.pulse += 0.02;
-        n.radius = n.baseRadius + Math.sin(n.pulse) * 0.5;
+        n.pulse += 0.015;
+        n.radius = n.baseRadius + Math.sin(n.pulse) * 0.3;
         n.x += n.vx;
         n.y += n.vy;
 
-        const dxLogo = logo.x - n.x;
-        const dyLogo = logo.y - n.y;
-        const distLogo = Math.sqrt(dxLogo * dxLogo + dyLogo * dyLogo);
-        if (distLogo < LOGO_ATTRACT_RADIUS && distLogo > 60) {
-          const force = 0.02 * (1 - distLogo / LOGO_ATTRACT_RADIUS);
-          n.vx += (dxLogo / distLogo) * force;
-          n.vy += (dyLogo / distLogo) * force;
+        // Gentle drift back toward home position (edges)
+        const dxHome = n.homeX - n.x;
+        const dyHome = n.homeY - n.y;
+        n.vx += dxHome * 0.0003;
+        n.vy += dyHome * 0.0003;
+
+        // Repel from center zone to keep vignette shape
+        const cx = width / 2;
+        const cy = height / 2;
+        const dxCenter = n.x - cx;
+        const dyCenter = n.y - cy;
+        const distCenter = Math.sqrt(dxCenter * dxCenter + dyCenter * dyCenter);
+        const edgeZone = width * 0.25;
+        if (distCenter < edgeZone) {
+          const repel = 0.01 * (1 - distCenter / edgeZone);
+          n.vx += (dxCenter / distCenter) * repel;
+          n.vy += (dyCenter / distCenter) * repel;
         }
 
-        if (distLogo < 70) {
-          const repel = 0.15 * (1 - distLogo / 70);
-          n.vx -= (dxLogo / distLogo) * repel;
-          n.vy -= (dyLogo / distLogo) * repel;
-        }
-
+        // Mouse interaction
         const dxMouse = n.x - mouse.x;
         const dyMouse = n.y - mouse.y;
         const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
         if (distMouse < MOUSE_RADIUS) {
-          const force = 0.8 * (1 - distMouse / MOUSE_RADIUS);
+          const force = 0.15 * (1 - distMouse / MOUSE_RADIUS);
           n.vx += (dxMouse / distMouse) * force;
           n.vy += (dyMouse / distMouse) * force;
         }
 
-        n.vx *= 0.98;
-        n.vy *= 0.98;
+        n.vx *= 0.92;
+        n.vy *= 0.92;
 
         if (n.x < -20) n.x = width + 20;
         if (n.x > width + 20) n.x = -20;
@@ -143,58 +162,32 @@ function NeuralHero({ tagline, taglineFade, darkMode }) {
         if (n.y > height + 20) n.y = -20;
       }
 
+      // Draw connections
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < CONNECTION_DIST) {
-            const alpha = (1 - dist / CONNECTION_DIST) * 0.25;
+            const alpha = (1 - dist / CONNECTION_DIST) * 0.2;
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
             ctx.strokeStyle = `rgba(0, 113, 227, ${alpha})`;
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
           }
         }
       }
 
+      // Draw nodes
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
-        const dx = logo.x - n.x;
-        const dy = logo.y - n.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < LOGO_ATTRACT_RADIUS && dist > 60) {
-          const alpha = (1 - dist / LOGO_ATTRACT_RADIUS) * 0.15;
-          ctx.beginPath();
-          ctx.moveTo(n.x, n.y);
-          ctx.lineTo(logo.x + (Math.random() - 0.5) * 40, logo.y + (Math.random() - 0.5) * 20);
-          ctx.strokeStyle = `rgba(0, 199, 255, ${alpha})`;
-          ctx.lineWidth = 0.4;
-          ctx.stroke();
-        }
-      }
-
-      for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
-        const distToLogo = Math.sqrt(
-          (logo.x - n.x) ** 2 + (logo.y - n.y) ** 2
-        );
-        const nearLogo = distToLogo < LOGO_ATTRACT_RADIUS;
-        const glow = nearLogo ? 8 : 4;
-
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-
-        if (nearLogo) {
-          ctx.fillStyle = `hsla(${n.hue}, 100%, 70%, 0.9)`;
-          ctx.shadowColor = `hsla(${n.hue}, 100%, 60%, 0.6)`;
-        } else {
-          ctx.fillStyle = `hsla(${n.hue}, 80%, 60%, 0.6)`;
-          ctx.shadowColor = `hsla(${n.hue}, 80%, 50%, 0.3)`;
-        }
-        ctx.shadowBlur = glow;
+        ctx.fillStyle = `hsla(${n.hue}, 70%, 60%, 0.4)`;
+        ctx.shadowColor = `hsla(${n.hue}, 70%, 50%, 0.2)`;
+        ctx.shadowBlur = 3;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
@@ -314,7 +307,7 @@ export default function HomePage({ darkMode }) {
     }
   }, [location.state]);
 
-  const previewTools = TOOLS.filter((t) => t.status === "live").slice(0, 2);
+  const previewTools = TOOLS.slice(0, 4);
 
   return (
     <>

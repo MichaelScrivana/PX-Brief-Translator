@@ -757,35 +757,144 @@ html, body, #root {
 /* ── Education Page ── */
 .hub-education-page {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 80px 32px;
 }
 
 .hub-education-inner {
-  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  max-width: 480px;
+  gap: 20px;
 }
 
-.hub-education-icon {
-  width: 80px;
-  height: 80px;
+.edu-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.edu-level-card {
+  border: 1px solid var(--border);
   border-radius: 20px;
-  background: linear-gradient(135deg, rgba(0, 113, 227, 0.12), rgba(0, 199, 255, 0.08));
-  color: var(--accent);
+  overflow: hidden;
+  background: var(--surface);
+  transition: all 0.3s ease;
+  position: relative;
+}
+.edu-level-card:hover {
+  border-color: var(--border-hover, rgba(255, 255, 255, 0.15));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+.edu-level-card-accent {
+  height: 2px;
+  width: 100%;
+  opacity: 0.6;
+  animation: accent-pulse 3s ease-in-out infinite;
+}
+.edu-level-card:hover .edu-level-card-accent {
+  opacity: 1;
+  animation: none;
+}
+.edu-level-card-body {
+  padding: 24px;
+}
+
+.edu-level-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.edu-level-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 980px;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+}
+
+.edu-level-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin: 0;
+}
+
+.edu-level-subtitle {
+  font-size: 13px;
+  color: var(--text-3);
+  margin: 3px 0 0;
+  line-height: 1.4;
+}
+
+.edu-resources {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edu-resource-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-2);
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+}
+.edu-resource-link:hover {
+  background: rgba(0, 113, 227, 0.08);
+  color: #0071e3;
+}
+.edu-resource-link svg {
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.edu-resource-link:hover svg {
+  opacity: 1;
 }
 
-.hub-coming-soon-badge {
-  font-family: var(--mono);
+.edu-resource-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edu-resource-tag {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 980px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.edu-section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 32px 0 8px;
+}
+
+.edu-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.edu-coming-soon-badge {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-3);
@@ -796,10 +905,29 @@ html, body, #root {
   letter-spacing: 0.05em;
 }
 
-.hub-education-desc {
-  font-size: 14px;
+.edu-levels-coming-soon {
+  opacity: 0.55;
+}
+
+.edu-level-card-soon {
+  pointer-events: none;
+}
+
+.edu-resource-disabled {
+  cursor: default;
   color: var(--text-3);
-  line-height: 1.6;
+}
+
+/* Light mode */
+.hub.light .edu-level-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+.hub.light .edu-level-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+.hub.light .edu-resource-link:hover {
+  background: rgba(0, 113, 227, 0.06);
 }
 
 /* ── Light mode additional overrides ── */

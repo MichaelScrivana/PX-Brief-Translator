@@ -24,6 +24,28 @@ export const TOOLS = [
     url: "https://calm-mushroom-0cfaf7f0f.1.azurestaticapps.net",
     status: "live",
   },
+  {
+    id: "design-reviewer",
+    name: "One A Day Design Reviewer",
+    description:
+      "An AI design review agent that checks designs for compliance before submission to the design manager. Submit your work for instant feedback.",
+    icon: "check",
+    gradient: ["#10b981", "#06b6d4"],
+    tags: ["Design Review", "Compliance", "QA"],
+    url: "https://zealous-ocean-0b50b761e.6.azurestaticapps.net/",
+    status: "live",
+  },
+  {
+    id: "coming-soon-placeholder",
+    name: "More Coming Soon",
+    description:
+      "We're building new AI-powered tools for the PX team. Stay tuned for what's next.",
+    icon: "sparkle",
+    gradient: ["#f59e0b", "#f97316"],
+    tags: ["AI", "PX", "New Tools"],
+    url: "",
+    status: "coming-soon",
+  },
   // ── Add more tools here ──
 ];
 
@@ -68,4 +90,11 @@ export const ArrowIcon = () => (
   </svg>
 );
 
-export const ICONS = { doc: DocIcon, user: UserIcon, sparkle: SparkleIcon };
+export const CheckIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 11l3 3L22 4" />
+    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+  </svg>
+);
+
+export const ICONS = { doc: DocIcon, user: UserIcon, sparkle: SparkleIcon, check: CheckIcon };

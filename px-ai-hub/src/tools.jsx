@@ -32,7 +32,7 @@ export const TOOLS = [
     icon: "check",
     gradient: ["#10b981", "#06b6d4"],
     tags: ["Design Review", "Compliance", "QA"],
-    url: "https://zealous-ocean-0b50b761e.4.azurestaticapps.net/",
+    url: "https://zealous-ocean-0b50b761e.6.azurestaticapps.net/",
     status: "live",
   },
   {

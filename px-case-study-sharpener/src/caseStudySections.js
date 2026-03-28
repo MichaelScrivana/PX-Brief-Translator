@@ -1,0 +1,60 @@
+// Case Study section definitions for the PX Case Study Sharpener
+// Icons are SVG component keys — mapped in CaseStudySharpener.jsx
+export const SECTIONS = [
+  {
+    id: "title",
+    label: "Project Title",
+    icon: "tag",
+    color: "#0071e3",
+    description: "Brand/product name + what was done",
+    example: "Elevit: Brand Redesign",
+  },
+  {
+    id: "objective",
+    label: "Objective",
+    icon: "target",
+    color: "#2563eb",
+    description: "Strategic goal, consumer context, business ambition",
+    example: "Evolve the Elevit Design & Brand World to help the brand firmly position itself as a global category leader that supports consumers from pre-conception through the first 2000 days.",
+  },
+  {
+    id: "services",
+    label: "Key Services",
+    icon: "layers",
+    color: "#7c3aed",
+    description: "Which PX capabilities were involved",
+    example: "Brand Identity, Brand World, Product Research, Science Storytelling, Graphic Innovation, Graphics Business Protection",
+  },
+  {
+    id: "team",
+    label: "Core Team",
+    icon: "users",
+    color: "#059669",
+    description: "Who worked on the project",
+    example: "Jacqueline Denham, Beth Roberts, Darryl Ng, Jemma Klein, Guillermo Gironelli",
+  },
+  {
+    id: "outcomes",
+    label: "Outcomes",
+    icon: "trending",
+    color: "#d97706",
+    description: "Measurable results, research validation, specific metrics",
+    example: "Pack Design validated via EyeSee research — Higher purchase intent: China 32.4% vs. 23.9%, Russia 18.3% vs. 16.2%. Improved findability with stronger brand block on shelf. Elevit logo trademarked in key markets.",
+  },
+  {
+    id: "launch",
+    label: "Launch",
+    icon: "send",
+    color: "#dc2626",
+    description: "Market rollout timeline with dates and regions",
+    example: "2025: China and key EMEA markets. 2026: Mexico. 2026/2027: AUS/Japan, Elevit Essentials (low income markets).",
+  },
+  {
+    id: "detail",
+    label: "Design Detail",
+    icon: "pen",
+    color: "#0891b2",
+    description: "The actual work — pack design rationale, brand world, distinctive assets, science storytelling, graphic adaptation",
+    example: "An ownable and modern pack design that brings to life the brand's credibility while driving a strong emotional connection and clear navigation. A rich asset toolbox allows for a cohesive brand expression.",
+  },
+];

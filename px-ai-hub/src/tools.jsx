@@ -36,15 +36,15 @@ export const TOOLS = [
     status: "live",
   },
   {
-    id: "coming-soon-placeholder",
-    name: "More Coming Soon",
+    id: "case-study-sharpener",
+    name: "Case Study Sharpener",
     description:
-      "We're building new AI-powered tools for the PX team. Stay tuned for what's next.",
-    icon: "sparkle",
-    gradient: ["#f59e0b", "#f97316"],
-    tags: ["AI", "PX", "New Tools"],
-    url: "",
-    status: "coming-soon",
+      "A conversational AI tool that helps project owners refine rough summaries into polished, structured case studies ready for PX.com. Powered by PX-Agent with full PX knowledge.",
+    icon: "doc",
+    gradient: ["#f59e0b", "#ef4444"],
+    tags: ["Case Studies", "PX.com", "AI Agent"],
+    url: "https://px-case-study-sharpener.azurewebsites.net",
+    status: "live",
   },
   // ── Add more tools here ──
 ];

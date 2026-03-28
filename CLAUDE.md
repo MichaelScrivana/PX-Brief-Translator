@@ -29,6 +29,7 @@ This is a monorepo containing multiple PX AI tools, all deployed as separate Azu
 | **AI Hub** | `px-ai-hub/` | TBD | 3002 | Landing page linking to all PX AI tools |
 | **Brief Translator** | `px-brief-translator/` | `proud-moss-0a781bf03.azurestaticapps.net` | 3000 | Translates project briefs into 6 sub-home working briefs |
 | **Persona Generator** | `px-persona-generator/` | `calm-mushroom-0cfaf7f0f.1.azurestaticapps.net` | 3001 | Generates synthetic consumer personas with deep dives and concept testing |
+| **Case Study Sharpener** | `px-case-study-sharpener/` | `px-case-study-sharpener.azurewebsites.net` | 3003 (frontend) / 3004 (server) | Conversational AI tool that helps refine project summaries into PX.com case studies. Uses Azure AI Foundry agent (PX-Agent) with knowledge sources. Has its own Node.js backend (not a static web app). |
 
 ---
 
@@ -254,6 +255,99 @@ Body:
 ```
 Response: `response.content[0].text`
 
+### Azure AI Foundry — Calling Agents with Knowledge Sources
+
+Azure AI Foundry agents (created in the Foundry portal) have their own knowledge bases, instructions, and tools. Calling them from code is more complex than standard API calls. Here's what we learned:
+
+**The problem:** Foundry agents require OAuth (Bearer token), NOT API keys. The standard `api-key` header works for direct model calls (chat completions), but the Responses API with `agent_reference` requires a proper Azure AD token with the `https://ai.azure.com` audience.
+
+**What does NOT work:**
+- Calling the agent directly from the browser (no way to get OAuth tokens client-side without an app registration)
+- Using the API key from the Foundry resource — returns 401 on the agent endpoint
+- OpenAI Assistants API (`/openai/assistants`) — Foundry declarative agents don't show up there
+- Most API versions — only `2025-05-15-preview` works as of March 2026
+
+**What DOES work:**
+
+1. **Get an OAuth token** (requires `az login` first):
+   ```bash
+   az login
+   TOKEN=$(az account get-access-token --resource https://ai.azure.com --query accessToken -o tsv)
+   ```
+
+2. **Call the agent via the Responses API:**
+   ```
+   POST {project_endpoint}/openai/responses?api-version=2025-05-15-preview
+   Headers:
+     Authorization: Bearer <oauth_token>
+     Content-Type: application/json
+   Body:
+   {
+     "input": [{"role": "user", "content": "..."}],
+     "agent_reference": {
+       "name": "<agent-name>",
+       "version": "<version>",
+       "type": "agent_reference"
+     }
+   }
+   ```
+   Response text is in: `response.output[].content[].text` (where type === "output_text")
+
+3. **For production (no user login required):** Deploy a Node.js backend to Azure App Service with Managed Identity enabled. The `@azure/identity` package's `DefaultAzureCredential` automatically uses the managed identity to get tokens — no keys, no logins.
+
+**Our Foundry setup:**
+- **Project endpoint:** `https://brandchatbot-1-resource.services.ai.azure.com/api/projects/brandchatbot-1`
+- **Agent:** `PX-Agent` version `6` (Claude Opus 4.6, has PX knowledge sources)
+- **Resource group:** `rg-brandchatbot-1` (Foundry resource), `DesignAgentGroup` (App Services)
+- **Subscription:** `AZS3248_DesignerAI` (`95bd45e7-6664-419c-8cf3-c0a9eb48cb8c`)
+
+**Deploying apps with backends to Azure App Service:**
+
+Bayer's Azure policy requires `--https-only true` when creating web apps. Without it, creation is blocked by the "CSF Secure Configuration" policy.
+
+```bash
+az webapp create \
+  --name <app-name> \
+  --resource-group DesignAgentGroup \
+  --plan ASP-DesignAgentGroup-b200 \
+  --runtime "NODE|20-lts" \
+  --https-only true
+```
+
+The `ASP-DesignAgentGroup-b200` plan (in `DesignAgentGroup` resource group, Canada Central) is already approved and hosts the OAD Design Reviewer. New apps can share this plan.
+
+After creating, enable Managed Identity and grant it "Cognitive Services User" on the Foundry resource:
+```bash
+PRINCIPAL_ID=$(az webapp identity assign --name <app-name> --resource-group DesignAgentGroup --query principalId -o tsv)
+
+az role assignment create \
+  --assignee-object-id $PRINCIPAL_ID \
+  --assignee-principal-type ServicePrincipal \
+  --role "Cognitive Services User" \
+  --scope "/subscriptions/95bd45e7-6664-419c-8cf3-c0a9eb48cb8c/resourceGroups/rg-brandchatbot-1/providers/Microsoft.CognitiveServices/accounts/brandchatbot-1-resource"
+```
+
+**Deployment:** Build the Vite frontend locally (`npm run build`), zip `server.js`, `package.json`, `dist/`, and `node_modules/`, then deploy with `SCM_DO_BUILD_DURING_DEPLOYMENT=false` (skip Oryx build since dist/ is pre-built):
+```bash
+az webapp deployment source config-zip --name <app-name> --resource-group DesignAgentGroup --src deploy.zip
+```
+
+**Also useful — calling Claude directly via Foundry (no agent, no OAuth needed):**
+```
+POST https://brandchatbot-1-resource.openai.azure.com/anthropic/v1/messages
+Headers:
+  x-api-key: <foundry-api-key>    <- from Azure Portal > resource > Keys
+  Content-Type: application/json
+  anthropic-version: 2023-06-01
+Body:
+{
+  "model": "claude-opus-4-6",
+  "messages": [{"role": "user", "content": "..."}],
+  "max_tokens": 4000
+}
+```
+This bypasses the agent (no knowledge sources) but works with just an API key. Good for prototyping.
+
 ---
 
 ## Deployment: Azure Static Web Apps
@@ -396,4 +490,4 @@ Azure deployments won't break (linked by repo ID, not name).
 
 ---
 
-*Last updated: March 2026*
+*Last updated: March 28, 2026*

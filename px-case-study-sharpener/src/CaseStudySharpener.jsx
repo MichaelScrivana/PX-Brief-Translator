@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { SECTIONS } from "./caseStudySections";
-import { SYSTEM_PROMPT } from "./systemPrompt";
 import * as XLSX from "xlsx";
 import "./styles.css";
 
@@ -147,7 +146,7 @@ const DEMO_RESULT = {
 
 export default function CaseStudySharpener() {
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "## PX Case Study Sharpener\n\nHi! I'll help you build a case study ready for PX.com.\n\nPaste your project summary below — rough notes, an email, bullet points — and we'll walk through it **section by section**:\n\n- **Project Title**\n- **Objective**\n- **Key Services**\n- **Core Team**\n- **Outcomes**\n- **Launch**\n- **Design Detail**\n\nLet's start — paste what you have." },
+    { role: "assistant", content: "## PX Case Study Sharpener\n\nHi! I'll help you build a case study ready for PX.com. How would you like to work?\n\n**Option 1 — Walk me through it**\nWe'll go section by section: Title, Objective, Key Services, Core Team, Outcomes, Launch, and Design Detail. I'll guide you through each one.\n\n**Option 2 — Paste what you have**\nDrop in whatever you've got — notes, emails, bullet points — and I'll review it all at once and give you my assessment.\n\nWhich do you prefer?" },
   ]);
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
@@ -159,12 +158,10 @@ export default function CaseStudySharpener() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // ── Azure AI Foundry Configuration ──
-  const FOUNDRY_ENDPOINT = "https://brandchatbot-1-resource.openai.azure.com/anthropic/v1/messages";
-  const FOUNDRY_API_KEY = import.meta.env.VITE_FOUNDRY_API_KEY || "";
-  const FOUNDRY_MODEL = "claude-opus-4-6";
+  // ── Backend API ──
+  const API_BASE = import.meta.env.VITE_API_BASE ?? "";
   const [showConfig, setShowConfig] = useState(false);
-  const [configSaved] = useState(true); // Always connected — no token needed
+  const [configSaved] = useState(true); // Always connected via backend
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
@@ -174,33 +171,24 @@ export default function CaseStudySharpener() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, result]);
 
-  const isDemo = false; // Always live — connected to Azure Foundry
+  const isDemo = false; // Always live — connected via backend to Foundry agent
 
   const callAPI = async (allMessages) => {
     const apiMessages = allMessages
       .filter((m) => m.role === "user" || m.role === "assistant")
       .map((m) => ({ role: m.role, content: m.content }));
 
-    const res = await fetch(FOUNDRY_ENDPOINT, {
+    const res = await fetch(`${API_BASE}/api/chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": FOUNDRY_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: FOUNDRY_MODEL,
-        system: SYSTEM_PROMPT,
-        messages: apiMessages,
-        max_tokens: 4000,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: apiMessages }),
     });
     if (!res.ok) {
       const e = await res.json().catch(() => ({}));
-      throw new Error(e.error?.message || `API error ${res.status}`);
+      throw new Error(e.error || `API error ${res.status}`);
     }
     const data = await res.json();
-    return data.content[0].text;
+    return data.response;
   };
 
   const handleSend = async () => {
@@ -241,42 +229,98 @@ export default function CaseStudySharpener() {
     return "#ef4444";
   };
 
-  const exportToExcel = () => {
-    if (!result?.sections) return;
-    const s = result.sections;
+  const [exporting, setExporting] = useState(false);
 
-    // Match the PX-template.xlsx structure
-    const data = [
-      ["PX.com", ""],
-      ["Section", "Text"],
-      ["Header", "Project"],
-      ["", s.title?.content || ""],
-      ["", ""],
-      ["Overview", ""],
-      ["left-side", "Objective"],
-      ["", s.objective?.content || ""],
-      ["", "Key Services"],
-      ["", s.services?.content || ""],
-      ["", "Core Team"],
-      ["", s.team?.content || ""],
-      ["right-side", "Outcomes"],
-      ["", s.outcomes?.content || ""],
-      ["", "Launch"],
-      ["", s.launch?.content || ""],
-      ["", ""],
-      ["Detail", ""],
-      ["Detail", ""],
-      ["Image 1", "Design Detail"],
-      ["", s.detail?.content || ""],
-    ];
+  const exportToExcel = async () => {
+    setExporting(true);
+    try {
+      // Ask Claude to compile the conversation into structured sections
+      const exportPrompt = [
+        ...messages.filter((m) => m.role === "user" || m.role === "assistant"),
+        {
+          role: "user",
+          content: `Based on our conversation so far, compile the final case study into this exact JSON format. Use the best version of each section from our discussion. If a section wasn't covered, leave it as an empty string.
 
-    const ws = XLSX.utils.aoa_to_array ? XLSX.utils.aoa_to_sheet(data) : XLSX.utils.aoa_to_sheet(data);
-    ws["!cols"] = [{ wch: 15 }, { wch: 80 }];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+{
+  "title": "Project title",
+  "objective": "The objective text",
+  "services": "Key services as a bullet list",
+  "team": "Core team names",
+  "outcomes": "Outcomes as a bullet list",
+  "launch": "Launch timeline",
+  "detail": "Design detail text"
+}
 
-    const title = s.title?.content?.replace(/[^a-zA-Z0-9 ]/g, "").trim().replace(/\s+/g, "-") || "CaseStudy";
-    XLSX.writeFile(wb, `PX-CaseStudy-${title}.xlsx`);
+Respond with ONLY the JSON, no other text.`
+        }
+      ];
+
+      const res = await fetch(FOUNDRY_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": FOUNDRY_API_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: FOUNDRY_MODEL,
+          system: "You are a helpful assistant. Return ONLY valid JSON with no markdown formatting or code blocks.",
+          messages: exportPrompt.map((m) => ({ role: m.role, content: m.content })),
+          max_tokens: 4000,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to compile case study");
+      const data = await res.json();
+      const raw = data.content[0].text;
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("Could not parse response");
+      const s = JSON.parse(jsonMatch[0]);
+
+      // Build Excel matching PX-template.xlsx structure
+      const rows = [
+        ["PX.com", ""],
+        ["Section", "Text"],
+        ["Header", "Project"],
+        ["", s.title || ""],
+        ["", ""],
+        ["Overview", ""],
+        ["left-side", "Objective"],
+        ["", s.objective || ""],
+        ["", "Key Services"],
+        ["", s.services || ""],
+        ["", "Core Team"],
+        ["", s.team || ""],
+        ["right-side", "Outcomes"],
+        ["", s.outcomes || ""],
+        ["", "Launch"],
+        ["", s.launch || ""],
+        ["", ""],
+        ["Detail", ""],
+        ["Detail", ""],
+        ["Image 1", "Design Detail"],
+        ["", s.detail || ""],
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws["!cols"] = [{ wch: 15 }, { wch: 80 }];
+      // Apply text wrap to all column B cells
+      for (let r = 0; r < rows.length; r++) {
+        const cell = ws[XLSX.utils.encode_cell({ r, c: 1 })];
+        if (cell) {
+          if (!cell.s) cell.s = {};
+          cell.s.alignment = { wrapText: true, vertical: "top" };
+        }
+      }
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+      const filename = (s.title || "CaseStudy").replace(/[^a-zA-Z0-9 ]/g, "").trim().replace(/\s+/g, "-");
+      XLSX.writeFile(wb, `PX-CaseStudy-${filename}.xlsx`);
+    } catch (e) {
+      setError(`Export failed: ${e.message}`);
+    }
+    setExporting(false);
   };
 
   return (
@@ -366,13 +410,19 @@ export default function CaseStudySharpener() {
             {/* Export button — shows after first assistant response */}
             {messages.length > 2 && (
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <button className="export-btn" onClick={exportToExcel} title="Export to PX template">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                  Export to Excel
+                <button className="export-btn" onClick={exportToExcel} disabled={exporting} title="Export to PX template">
+                  {exporting ? (
+                    <><div className="spinner" style={{ width: 14, height: 14 }} /> Compiling...</>
+                  ) : (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                      Export to Excel
+                    </>
+                  )}
                 </button>
               </div>
             )}

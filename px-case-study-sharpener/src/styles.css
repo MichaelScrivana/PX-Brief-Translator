@@ -2193,6 +2193,15 @@
   background: var(--success);
   color: #fff;
 }
+.export-btn-sp {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+.export-btn-sp:hover {
+  background: var(--accent);
+  color: #fff;
+}
 
 .section-tab-icon {
   display: flex;

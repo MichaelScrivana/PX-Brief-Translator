@@ -120,6 +120,18 @@ PX-AI-Tools/                          <- GitHub repo root
 
 ## Critical Rules (Read Before Touching Anything)
 
+### 0. Everything MUST be Bayer-access only
+
+All tools, APIs, and deployments in this project are internal to Bayer. Nothing should be publicly accessible.
+
+- **App Services** must have Azure AD authentication enabled (`--aad-client-id` with Bayer tenant `fcb2b37b-5da0-466b-9b83-0014b67a7c78`). Users must log in with their `@bayer.com` account.
+- **API keys and tokens** must NEVER be committed to git. Use `.env` files (gitignored) locally and App Service environment variables in production.
+- **Static Web Apps** (Hub, Brief Translator, Persona Generator) are client-side only — they have no backend secrets, but all API calls require user-provided tokens (MGA, Anthropic, etc.).
+- **New App Services** must be created with `--https-only true` (Bayer policy) and have Easy Auth enabled immediately after creation.
+- **Managed Identity** is the preferred auth method for server-to-server calls (e.g., App Service → Azure AI Foundry). Never hardcode service credentials.
+
+When creating any new tool or deployment, verify it is not publicly accessible before sharing the URL.
+
 ### 1. Static assets MUST be inside `public/`
 
 Vite only copies files from `public/` into the `dist/` build output. If you put images, JSON files, or configs outside `public/`, they'll work in `npm run dev` but **disappear in production**.

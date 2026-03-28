@@ -230,6 +230,82 @@ export default function CaseStudySharpener() {
   };
 
   const [exporting, setExporting] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyForSharePoint = async () => {
+    setExporting(true);
+    try {
+      const exportPrompt = [
+        ...messages.filter((m) => m.role === "user" || m.role === "assistant"),
+        {
+          role: "user",
+          content: `Based on our conversation so far, compile the final case study into this exact JSON format. Use the best version of each section from our discussion. If a section wasn't covered, leave it as an empty string.
+
+{
+  "title": "Project title",
+  "objective": "The objective text",
+  "services": "Key services as a bullet list",
+  "team": "Core team names",
+  "outcomes": "Outcomes as a bullet list",
+  "launch": "Launch timeline",
+  "detail": "Design detail text"
+}
+
+Respond with ONLY the JSON, no other text.`
+        }
+      ];
+
+      const res = await fetch(`${API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: exportPrompt.map((m) => ({ role: m.role, content: m.content })) }),
+      });
+
+      if (!res.ok) throw new Error("Failed to compile case study");
+      const data = await res.json();
+      const raw = data.response;
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("Could not parse response");
+      const s = JSON.parse(jsonMatch[0]);
+
+      // Build tab-separated values matching PX template structure
+      // Excel/SharePoint understands TSV when pasting
+      const rows = [
+        ["PX.com", ""],
+        ["Section", "Text"],
+        ["Header", "Project"],
+        ["", s.title || ""],
+        ["", ""],
+        ["Overview", ""],
+        ["left-side", "Objective"],
+        ["", s.objective || ""],
+        ["", "Key Services"],
+        ["", s.services || ""],
+        ["", "Core Team"],
+        ["", s.team || ""],
+        ["right-side", "Outcomes"],
+        ["", s.outcomes || ""],
+        ["", "Launch"],
+        ["", s.launch || ""],
+        ["", ""],
+        ["Detail", ""],
+        ["Detail", ""],
+        ["Image 1", "Design Detail"],
+        ["", s.detail || ""],
+      ];
+
+      const tsv = rows.map((r) => r.join("\t")).join("\n");
+      await navigator.clipboard.writeText(tsv);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+
+      // Also open SharePoint in a new tab
+      window.open("https://bayergroup.sharepoint.com/sites/PackagingDesign299/_layouts/15/Doc.aspx?sourcedoc=%7B14D6CD0D-24B1-422F-A03F-32645C67C964%7D&file=px_com%20master%20template.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1", "_blank");
+    } catch (e) {
+      setError(`Copy failed: ${e.message}`);
+    }
+    setExporting(false);
+  };
 
   const exportToExcel = async () => {
     setExporting(true);
@@ -415,20 +491,18 @@ Respond with ONLY the JSON, no other text.`
                     </>
                   )}
                 </button>
-                <a
-                  href="https://bayergroup.sharepoint.com/sites/PackagingDesign299/_layouts/15/Doc.aspx?sourcedoc=%7B14D6CD0D-24B1-422F-A03F-32645C67C964%7D&file=px_com%20master%20template.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
                   className="export-btn export-btn-sp"
-                  title="Open PX template on SharePoint"
+                  onClick={copyForSharePoint}
+                  disabled={exporting}
+                  title="Copy formatted data for pasting into SharePoint Excel"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                   </svg>
-                  Open in SharePoint
-                </a>
+                  {copied ? "Copied!" : "Copy for SharePoint"}
+                </button>
               </div>
             )}
             <div ref={messagesEndRef} />

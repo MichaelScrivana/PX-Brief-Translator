@@ -255,24 +255,15 @@ Respond with ONLY the JSON, no other text.`
         }
       ];
 
-      const res = await fetch(FOUNDRY_ENDPOINT, {
+      const res = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": FOUNDRY_API_KEY,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: FOUNDRY_MODEL,
-          system: "You are a helpful assistant. Return ONLY valid JSON with no markdown formatting or code blocks.",
-          messages: exportPrompt.map((m) => ({ role: m.role, content: m.content })),
-          max_tokens: 4000,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: exportPrompt.map((m) => ({ role: m.role, content: m.content })) }),
       });
 
       if (!res.ok) throw new Error("Failed to compile case study");
       const data = await res.json();
-      const raw = data.content[0].text;
+      const raw = data.response;
       const jsonMatch = raw.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error("Could not parse response");
       const s = JSON.parse(jsonMatch[0]);

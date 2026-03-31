@@ -24,6 +24,41 @@ const MoonIcon = () => (
   </svg>
 );
 
+// Case study icon — document with magnifying glass
+const CaseStudyIcon = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <circle cx="11" cy="15" r="3" />
+    <line x1="13.1" y1="17.1" x2="15" y2="19" />
+  </svg>
+);
+
+// ── Fun thinking messages (PX-themed) ──
+const THINKING_MESSAGES = [
+  "Reviewing brand architecture...",
+  "Cross-referencing PX case studies...",
+  "Checking the creative rationale...",
+  "Evaluating pack design impact...",
+  "Scanning for missing metrics...",
+  "Sharpening the narrative arc...",
+  "Consulting the PX playbook...",
+  "Assessing consumer insight depth...",
+  "Benchmarking against best-in-class...",
+  "Polishing the storytelling...",
+  "Examining launch strategy...",
+  "Calibrating the sharpness meter...",
+  "Interrogating vague language...",
+  "Channeling design excellence...",
+  "Hunting for specificity...",
+];
+
+const NewChatIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+  </svg>
+);
+
 // ── Section SVG Icons (matching Hub style) ──
 const TagIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -69,6 +104,29 @@ const PenIcon = () => (
 );
 
 const SECTION_ICONS = { tag: TagIcon, target: TargetIcon, layers: LayersIcon, users: UsersIcon, trending: TrendingIcon, send: SendIcon, pen: PenIcon };
+
+const DEFAULT_GUIDELINES = `What Makes a Great PX Case Study
+
+1. Specificity over generality
+Every claim needs evidence. "Results were positive" means nothing — "purchase intent increased 18% in validated EyeSee research" tells a story. If you can't put a number on it, describe the before/after concretely.
+
+2. Show the strategic thinking
+Don't just list what was done — explain WHY. What was the insight? What consumer tension did the design solve? A great case study connects the brief to the creative rationale to the outcome.
+
+3. PX capabilities front and center
+Name every PX discipline that contributed (Brand Design, Pack Design, Product Research, Science Storytelling, Graphics Innovation, etc.). This is how we demonstrate the breadth and depth of what PX delivers.
+
+4. Real team attribution
+Full names, not just first names. Credit the people who did the work. This matters for recognition and for showing clients the calibre of our team.
+
+5. Visual storytelling
+The design detail section should make someone who wasn't on the project understand what was created and why it works. Describe the visual system, distinctive assets, and design rationale — not just "we used a heart motif."
+
+6. Global scale and ambition
+Show the rollout: which markets, what timeline, what's next. PX works globally — the case study should reflect that scope.
+
+7. Client-ready tone
+Write as if the CMO of the brand will read this. Professional, confident, specific. No internal shorthand or vague language.`;
 
 const RATING_CONFIG = {
   strong: { label: "Strong", color: "#10b981", icon: "\u2713" },
@@ -145,9 +203,9 @@ const DEMO_RESULT = {
 };
 
 export default function CaseStudySharpener() {
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: "## PX Case Study Sharpener\n\nHi! I'll help you build a case study ready for PX.com. How would you like to work?\n\n**Option 1 — Walk me through it**\nWe'll go section by section: Title, Objective, Key Services, Core Team, Outcomes, Launch, and Design Detail. I'll guide you through each one.\n\n**Option 2 — Paste what you have**\nDrop in whatever you've got — notes, emails, bullet points — and I'll review it all at once and give you my assessment.\n\nWhich do you prefer?" },
-  ]);
+  const INITIAL_MESSAGE = { role: "assistant", content: "## PX Case Study Sharpener\n\nI'll help you turn project notes into a polished case study for PX.com.\n\n**Option 1 — Walk me through it**\nWe'll go section by section: Title, Objective, Key Services, Core Team, Outcomes, Launch, and Design Detail. I'll guide you through each one.\n\n**Option 2 — Paste what you have**\nDrop in whatever you've got — notes, emails, bullet points — and I'll review it all at once.\n\n**Option 3 — Try the example**\nClick **Load Example** below to see how I sharpen a rough draft.\n\nYou can also adjust the **Guidelines** in the header to set your own scoring criteria." };
+
+  const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
@@ -171,12 +229,39 @@ export default function CaseStudySharpener() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, result]);
 
+  // ── Thinking message cycling ──
+  const [thinkingMsg, setThinkingMsg] = useState("");
+  useEffect(() => {
+    if (!loading) { setThinkingMsg(""); return; }
+    // Pick a random starting message
+    setThinkingMsg(THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)]);
+    const interval = setInterval(() => {
+      setThinkingMsg((prev) => {
+        let next;
+        do { next = THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)]; } while (next === prev);
+        return next;
+      });
+    }, 2800);
+    return () => clearInterval(interval);
+  }, [loading]);
+
   const isDemo = false; // Always live — connected via backend to Foundry agent
 
   const callAPI = async (allMessages) => {
     const apiMessages = allMessages
       .filter((m) => m.role === "user" || m.role === "assistant")
       .map((m) => ({ role: m.role, content: m.content }));
+
+    // Prepend guidelines as context if enabled
+    if (guidelinesEnabled && guidelines.trim()) {
+      apiMessages.unshift({
+        role: "user",
+        content: `[REVIEW GUIDELINES — Use these criteria when evaluating case studies]\n\n${guidelines.trim()}`,
+      }, {
+        role: "assistant",
+        content: "Understood. I'll use these guidelines as my evaluation criteria when reviewing case study content.",
+      });
+    }
 
     const res = await fetch(`${API_BASE}/api/chat`, {
       method: "POST",
@@ -231,6 +316,36 @@ export default function CaseStudySharpener() {
 
   const [exporting, setExporting] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // ── Guidelines ──
+  const [showGuidelines, setShowGuidelines] = useState(false);
+  const [guidelines, setGuidelines] = useState(() => {
+    return localStorage.getItem("px-cs-guidelines") ?? DEFAULT_GUIDELINES;
+  });
+  const [guidelinesEnabled, setGuidelinesEnabled] = useState(() => {
+    return localStorage.getItem("px-cs-guidelines-enabled") !== "false";
+  });
+
+  const saveGuidelines = (text) => {
+    setGuidelines(text);
+    localStorage.setItem("px-cs-guidelines", text);
+  };
+  const toggleGuidelines = (on) => {
+    setGuidelinesEnabled(on);
+    localStorage.setItem("px-cs-guidelines-enabled", String(on));
+  };
+
+  const handleNewChat = () => {
+    setMessages([INITIAL_MESSAGE]);
+    setResult(null);
+    setError("");
+    setInput("");
+  };
+
+  const loadSample = () => {
+    setInput(SAMPLE_INPUT);
+    inputRef.current?.focus();
+  };
 
   const copyForSharePoint = async () => {
     setExporting(true);
@@ -402,11 +517,60 @@ Respond with ONLY the JSON, no other text.`
         </div>
         <div className="header-right">
           <span className="header-badge">Case Study Sharpener</span>
+          {messages.length > 1 && (
+            <button className="new-chat-btn" onClick={handleNewChat} title="New conversation">
+              <NewChatIcon /> New
+            </button>
+          )}
           <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)} title={darkMode ? "Light mode" : "Dark mode"}>
             {darkMode ? <SunIcon /> : <MoonIcon />}
           </button>
         </div>
       </header>
+
+      {/* ── Guidelines Modal ── */}
+      {showGuidelines && (
+        <div className="guidelines-overlay" onClick={() => setShowGuidelines(false)}>
+          <div className="guidelines-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="guidelines-modal-header">
+              <h2 className="guidelines-modal-title">Review Guidelines</h2>
+              <p className="guidelines-modal-desc">
+                Define what makes a great case study. The AI will use these criteria when reviewing drafts.
+              </p>
+            </div>
+            <div className="guidelines-toggle-row">
+              <label className="guidelines-toggle-label">
+                <input
+                  type="checkbox"
+                  checked={guidelinesEnabled}
+                  onChange={(e) => toggleGuidelines(e.target.checked)}
+                />
+                <span className="guidelines-toggle-switch" />
+                <span>{guidelinesEnabled ? "Guidelines active" : "Guidelines off"}</span>
+              </label>
+              <button
+                className="guidelines-reset-btn"
+                onClick={() => saveGuidelines(DEFAULT_GUIDELINES)}
+                title="Reset to default"
+              >
+                Reset to default
+              </button>
+            </div>
+            <textarea
+              className="guidelines-textarea"
+              value={guidelines}
+              onChange={(e) => saveGuidelines(e.target.value)}
+              placeholder="Describe your criteria for evaluating case studies..."
+              rows={16}
+            />
+            <div className="guidelines-modal-footer">
+              <button className="guidelines-done-btn" onClick={() => setShowGuidelines(false)}>
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="main">
         {error && <div className="error-banner">{error}</div>}
@@ -415,21 +579,26 @@ Respond with ONLY the JSON, no other text.`
         <div className="chat-conversation">
           <div className="chat-dialog-header">
             <div className="chat-dialog-avatar">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L13.09 8.26L18 6L14.74 10.91L21 12L14.74 13.09L18 18L13.09 15.74L12 22L10.91 15.74L6 18L9.26 13.09L3 12L9.26 10.91L6 6L10.91 8.26L12 2Z" />
-              </svg>
+              <CaseStudyIcon size={16} />
             </div>
             <div className="chat-dialog-title">PX Case Study Sharpener</div>
+            {guidelinesEnabled && (
+              <div className="chat-guidelines-badge" onClick={() => setShowGuidelines(true)} title="Edit guidelines">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Guidelines ON
+              </div>
+            )}
           </div>
 
           <div className="chat-messages">
             {messages.map((msg, i) => (
-              <div key={i} className={`chat-msg ${msg.role === "user" ? "chat-msg-user" : "chat-msg-assistant"}`}>
+              <div key={i} className={`chat-msg ${msg.role === "user" ? "chat-msg-user" : "chat-msg-assistant"} chat-msg-enter`}>
                 {msg.role === "assistant" && (
                   <div className="chat-avatar">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L13.09 8.26L18 6L14.74 10.91L21 12L14.74 13.09L18 18L13.09 15.74L12 22L10.91 15.74L6 18L9.26 13.09L3 12L9.26 10.91L6 6L10.91 8.26L12 2Z" />
-                    </svg>
+                    <CaseStudyIcon size={14} />
                   </div>
                 )}
                 <div className={`chat-bubble ${msg.role === "user" ? "chat-bubble-user" : "chat-bubble-assistant"}`}>
@@ -460,15 +629,14 @@ Respond with ONLY the JSON, no other text.`
             ))}
 
             {loading && (
-              <div className="chat-msg chat-msg-assistant">
+              <div className="chat-msg chat-msg-assistant chat-msg-enter">
                 <div className="chat-avatar">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L13.09 8.26L18 6L14.74 10.91L21 12L14.74 13.09L18 18L13.09 15.74L12 22L10.91 15.74L6 18L9.26 13.09L3 12L9.26 10.91L6 6L10.91 8.26L12 2Z" />
-                  </svg>
+                  <CaseStudyIcon size={14} />
                 </div>
-                <div className="chat-bubble chat-bubble-assistant">
-                  <div className="chat-typing">
-                    <span /><span /><span />
+                <div className="chat-bubble chat-bubble-assistant thinking-bubble">
+                  <div className="thinking-status">
+                    <div className="thinking-spinner" />
+                    <span className="thinking-text" key={thinkingMsg}>{thinkingMsg}</span>
                   </div>
                 </div>
               </div>
@@ -510,6 +678,11 @@ Respond with ONLY the JSON, no other text.`
 
           {/* ── Chat Input ── */}
           <div className="chat-input-bar">
+            {messages.length <= 1 && !input && (
+              <button className="load-sample-btn" onClick={loadSample}>
+                Load Example
+              </button>
+            )}
             <textarea
               ref={inputRef}
               value={input}
@@ -517,7 +690,7 @@ Respond with ONLY the JSON, no other text.`
               onKeyDown={handleKeyDown}
               placeholder="Paste your project summary here..."
               className="chat-input"
-              rows={1}
+              rows={2}
               disabled={loading}
             />
             <button className="chat-send-btn" onClick={handleSend} disabled={!input.trim() || loading} title="Send">

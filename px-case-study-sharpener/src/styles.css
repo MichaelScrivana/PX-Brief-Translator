@@ -2232,6 +2232,39 @@
   flex-shrink: 0;
 }
 
+/* ── Mode Picker ── */
+.mode-picker {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.mode-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border-s);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.mode-option:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+.mode-option svg {
+  flex-shrink: 0;
+}
+
 /* ── New Chat Button ── */
 .new-chat-btn {
   display: flex;

@@ -1,16 +1,12 @@
-// Service Worker for PX Brief Translator PWA
-const CACHE_NAME = "px-brief-translator-v1";
-const STATIC_ASSETS = ["/", "/index.html"];
+// Service Worker for PX Case Study Sharpener PWA
+const CACHE_NAME = "px-case-study-sharpener-v2";
 
-// Install: cache shell
+// Install: skip waiting to activate immediately
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-  );
   self.skipWaiting();
 });
 
-// Activate: clean old caches
+// Activate: clean ALL old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -20,25 +16,24 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for API calls, cache-first for static assets
+// Fetch: network-first — always try to get fresh content
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  // Always go to network for API calls
-  if (request.url.includes("/api/") || request.url.includes("chat.int.bayer.com")) {
+  // Skip non-GET and API calls
+  if (request.method !== "GET" || request.url.includes("/api/") || request.url.includes("chat.int.bayer.com")) {
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const networkFetch = fetch(request).then((response) => {
+    fetch(request)
+      .then((response) => {
         if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         }
         return response;
-      });
-      return cached || networkFetch;
-    })
+      })
+      .catch(() => caches.match(request))
   );
 });

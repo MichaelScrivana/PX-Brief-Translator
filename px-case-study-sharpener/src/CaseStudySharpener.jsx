@@ -105,28 +105,58 @@ const PenIcon = () => (
 
 const SECTION_ICONS = { tag: TagIcon, target: TargetIcon, layers: LayersIcon, users: UsersIcon, trending: TrendingIcon, send: SendIcon, pen: PenIcon };
 
-const DEFAULT_GUIDELINES = `What Makes a Great PX Case Study
+const DEFAULT_GUIDELINES = `PX.com Case Study Guidelines
 
-1. Specificity over generality
-Every claim needs evidence. "Results were positive" means nothing — "purchase intent increased 18% in validated EyeSee research" tells a story. If you can't put a number on it, describe the before/after concretely.
+BACKGROUND
+The PX.com website captures who we are, our services, our projects (case studies), and contact info. The goal is to build awareness and increase demand from our organisation for our services. Our target audience is primarily global and local marketing, and key members of the Science community.
 
-2. Show the strategic thinking
-Don't just list what was done — explain WHY. What was the insight? What consumer tension did the design solve? A great case study connects the brief to the creative rationale to the outcome.
+Our key focus is adding more case studies to capture tangible examples of the diversity of our impact.
 
-3. PX capabilities front and center
-Name every PX discipline that contributed (Brand Design, Pack Design, Product Research, Science Storytelling, Graphics Innovation, etc.). This is how we demonstrate the breadth and depth of what PX delivers.
+CASE STUDY STRUCTURE
 
-4. Real team attribution
-Full names, not just first names. Credit the people who did the work. This matters for recognition and for showing clients the calibre of our team.
+Objective: An outline of the core project objective, framed within the context of a brand, capturing the problem statement and target outcome / benefit to the business, consumer and/or environment. Approx 30-40 words maximum.
 
-5. Visual storytelling
-The design detail section should make someone who wasn't on the project understand what was created and why it works. Describe the visual system, distinctive assets, and design rationale — not just "we used a heart motif."
+Key Services: A bullet point list drawn from the master list of 15 PX services (see below). Only use services from this list.
 
-6. Global scale and ambition
-Show the rollout: which markets, what timeline, what's next. PX works globally — the case study should reflect that scope.
+Core Team: The names of the core PX team members (full names).
 
-7. Client-ready tone
-Write as if the CMO of the brand will read this. Professional, confident, specific. No internal shorthand or vague language.`;
+Outcomes: A bullet point list of key achievements and deliverables. These should ladder up to the objective, and can include milestones (research results, IP granted) as well as in-market impact / business results. Approx 4-6 bullets, each ideally a single sentence, approx 8-15 words maximum.
+
+Launch: Target or actual launch date and key markets / regions.
+
+Image Text: Hero image captures the essence of the project. Supplementary images with text bring to life key deliverables, often linked to our services.
+
+OPTIMISATION GOALS
+- Ensure consistency in language, tone and detail across all case studies
+- Vocabulary relevant to our SME but clear to non-experts of PX disciplines
+- Copy delivers on the intent of each section as framed above
+- Services must be from the master list of 15 PX services only
+- Optimise phrasing to maximise clarity and impact related to our mission
+- Optimise word count per section guidelines above
+
+MASTER LIST OF 15 PX SERVICES
+
+Product Research:
+- Foundational Product Insights
+- Science Insights
+- Product Research
+- Product Claims
+
+Design:
+- Futuring
+- Brand Identity (2D & 3D)
+- Brand World
+- Science Storytelling
+- Product Experience Design
+
+Packaging:
+- Packaging Strategy
+- Packaging Innovation
+- Packaging Business Protection
+- Graphic Innovation
+- Graphic Business Protection
+- Environmental Claims
+- Data Analytics & Reporting`;
 
 const RATING_CONFIG = {
   strong: { label: "Strong", color: "#10b981", icon: "\u2713" },
@@ -203,9 +233,10 @@ const DEMO_RESULT = {
 };
 
 export default function CaseStudySharpener() {
-  const INITIAL_MESSAGE = { role: "assistant", content: "## PX Case Study Sharpener\n\nI'll help you turn project notes into a polished case study for PX.com.\n\n**Option 1 — Walk me through it**\nWe'll go section by section: Title, Objective, Key Services, Core Team, Outcomes, Launch, and Design Detail. I'll guide you through each one.\n\n**Option 2 — Paste what you have**\nDrop in whatever you've got — notes, emails, bullet points — and I'll review it all at once.\n\n**Option 3 — Try the example**\nClick **Load Example** below to see how I sharpen a rough draft.\n\nYou can also adjust the **Guidelines** in the header to set your own scoring criteria." };
+  const INITIAL_MESSAGE = { role: "assistant", content: "## PX Case Study Sharpener\n\nI'll help you turn project notes into a polished case study for PX.com. How would you like to start?" };
 
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
+  const [mode, setMode] = useState(null); // null = picking, "guided" | "paste" | "example"
   const [input, setInput] = useState("");
   const [result, setResult] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
@@ -340,11 +371,36 @@ export default function CaseStudySharpener() {
     setResult(null);
     setError("");
     setInput("");
+    setMode(null);
   };
 
-  const loadSample = () => {
-    setInput(SAMPLE_INPUT);
-    inputRef.current?.focus();
+  const selectMode = (chosen) => {
+    setMode(chosen);
+    if (chosen === "guided") {
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", content: "Walk me through it section by section." },
+        { role: "assistant", content: "Let's build your case study step by step.\n\n### Objective\n\nWhat's the core project objective? Frame it around the brand, the problem statement, and the target outcome or benefit.\n\nAim for **30-40 words** — concise but clear enough that someone outside PX understands the ambition.\n\nFor example: *\"Redesign the Elevit brand identity across all global markets to reposition as a category leader supporting consumers from pre-conception through the first 2,000 days.\"*" },
+      ]);
+    } else if (chosen === "paste") {
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", content: "I'll paste what I have." },
+        { role: "assistant", content: "Go ahead — paste your project notes, emails, bullet points, or draft copy below.\n\nI'll review it against the PX.com case study structure:\n- **Objective** (30-40 words)\n- **Key Services** (from the master list of 15)\n- **Core Team** (full names)\n- **Outcomes** (4-6 bullets, 8-15 words each)\n- **Launch** (date + markets)\n- **Image Text** (hero + supporting visuals)\n\nI'll tell you what's strong, what needs work, and what's missing." },
+      ]);
+    } else if (chosen === "example") {
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", content: SAMPLE_INPUT },
+      ]);
+      // Send the sample to the API
+      const newMessages = [...messages, { role: "user", content: SAMPLE_INPUT }];
+      setError(""); setLoading(true);
+      callAPI(newMessages)
+        .then((raw) => setMessages((prev) => [...prev, { role: "assistant", content: raw }]))
+        .catch((e) => setMessages((prev) => [...prev, { role: "assistant", content: `Something went wrong: ${e.message}` }]))
+        .finally(() => setLoading(false));
+    }
   };
 
   const copyForSharePoint = async () => {
@@ -676,30 +732,51 @@ Respond with ONLY the JSON, no other text.`
             <div ref={messagesEndRef} />
           </div>
 
-          {/* ── Chat Input ── */}
-          <div className="chat-input-bar">
-            {messages.length <= 1 && !input && (
-              <button className="load-sample-btn" onClick={loadSample}>
-                Load Example
+          {/* ── Mode Selection or Chat Input ── */}
+          {!mode ? (
+            <div className="mode-picker">
+              <button className="mode-option" onClick={() => selectMode("guided")}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                Walk me through it
               </button>
-            )}
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Paste your project summary here..."
-              className="chat-input"
-              rows={2}
-              disabled={loading}
-            />
-            <button className="chat-send-btn" onClick={handleSend} disabled={!input.trim() || loading} title="Send">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            </button>
-          </div>
+              <button className="mode-option" onClick={() => selectMode("paste")}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                Paste what I have
+              </button>
+              <button className="mode-option" onClick={() => selectMode("example")}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+                Try the example
+              </button>
+            </div>
+          ) : (
+            <div className="chat-input-bar">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type your response..."
+                className="chat-input"
+                rows={2}
+                disabled={loading}
+              />
+              <button className="chat-send-btn" onClick={handleSend} disabled={!input.trim() || loading} title="Send">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </main>
     </div>

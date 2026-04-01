@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { SECTIONS } from "./caseStudySections";
 import * as XLSX from "xlsx";
+import ImagePanel, { ImageIcon } from "./ImagePanel";
 import "./styles.css";
 
 const AI_HUB_URL = "https://salmon-island-0f8fa491e.4.azurestaticapps.net";
@@ -246,6 +247,8 @@ export default function CaseStudySharpener() {
   const [menuOpen, setMenuOpen] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const [images, setImages] = useState([]);
+  const [panelOpen, setPanelOpen] = useState(true);
 
   // ── Backend API ──
   const API_BASE = import.meta.env.VITE_API_BASE ?? "";
@@ -372,6 +375,7 @@ export default function CaseStudySharpener() {
     setError("");
     setInput("");
     setMode(null);
+    setImages([]);
   };
 
   const selectMode = (chosen) => {
@@ -460,10 +464,19 @@ Respond with ONLY the JSON, no other text.`
         ["", s.launch || ""],
         ["", ""],
         ["Detail", ""],
-        ["Detail", ""],
-        ["Image 1", "Design Detail"],
         ["", s.detail || ""],
+        ["", ""],
+        ["Images", ""],
       ];
+
+      // Append image captions
+      images.forEach((img, i) => {
+        if (i === 0) {
+          rows.push(["Hero Image", ""]);
+        } else {
+          rows.push([`Image ${i}`, img.caption || ""]);
+        }
+      });
 
       const tsv = rows.map((r) => r.join("\t")).join("\n");
       await navigator.clipboard.writeText(tsv);
@@ -535,10 +548,19 @@ Respond with ONLY the JSON, no other text.`
         ["", s.launch || ""],
         ["", ""],
         ["Detail", ""],
-        ["Detail", ""],
-        ["Image 1", "Design Detail"],
         ["", s.detail || ""],
+        ["", ""],
+        ["Images", ""],
       ];
+
+      // Append image captions
+      images.forEach((img, i) => {
+        if (i === 0) {
+          rows.push(["Hero Image", ""]);
+        } else {
+          rows.push([`Image ${i}`, img.caption || ""]);
+        }
+      });
 
       const ws = XLSX.utils.aoa_to_sheet(rows);
       ws["!cols"] = [{ wch: 15 }, { wch: 80 }];
@@ -578,6 +600,14 @@ Respond with ONLY the JSON, no other text.`
               <NewChatIcon /> New
             </button>
           )}
+          <button
+            className={`image-panel-toggle ${panelOpen ? "image-panel-toggle-active" : ""}`}
+            onClick={() => setPanelOpen(!panelOpen)}
+            title={panelOpen ? "Hide images" : "Show images"}
+          >
+            <ImageIcon size={14} /> Images
+            {images.length > 0 && <span className="image-toggle-count">{images.length}</span>}
+          </button>
           <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)} title={darkMode ? "Light mode" : "Dark mode"}>
             {darkMode ? <SunIcon /> : <MoonIcon />}
           </button>
@@ -628,6 +658,7 @@ Respond with ONLY the JSON, no other text.`
         </div>
       )}
 
+      <div className="app-body">
       <main className="main">
         {error && <div className="error-banner">{error}</div>}
 
@@ -765,6 +796,14 @@ Respond with ONLY the JSON, no other text.`
           )}
         </div>
       </main>
+
+      {/* ── Image Side Panel ── */}
+      {panelOpen && (
+        <aside className="image-panel">
+          <ImagePanel images={images} onImagesChange={setImages} />
+        </aside>
+      )}
+      </div>{/* end .app-body */}
     </div>
   );
 }

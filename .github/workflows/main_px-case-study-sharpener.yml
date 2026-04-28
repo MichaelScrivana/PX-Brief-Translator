@@ -53,7 +53,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'px-case-study-sharpener'
+          app-name: 'px-case-study-sharpener-bridge'
           slot-name: 'Production'
           package: .
           
